@@ -1,7 +1,6 @@
 numpy>=1.24
 sentence-transformers>=2.2.2
 
-# FAISS Python wheels are generally not available on Windows via pip.
-# - Linux/macOS: `pip install -r requirements.txt` will install faiss-cpu.
-# - Windows: install FAISS via conda, see RUN.md.
-faiss-cpu>=1.7.4; platform_system != "Windows"
+# FAISS is optional and provided in separate files:
+# - CPU: requirements-faiss-cpu.txt
+# - GPU: requirements-faiss-gpu.txt (typically installed via conda, see RUN.md)

@@ -1,0 +1,5 @@
+# Optional: FAISS (GPU)
+#
+# GPU builds are best installed via conda because pip wheels are not
+# consistently available across platforms/CUDA versions.
+# See RUN.md for recommended conda commands.

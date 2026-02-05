@@ -1,0 +1,10 @@
+# Optional: FAISS (CPU)
+#
+# Linux/macOS (pip):
+#   pip install -r requirements.txt -r requirements-faiss-cpu.txt
+#
+# Windows:
+#   Prefer conda (see RUN.md):
+#     conda install -c conda-forge faiss-cpu
+
+faiss-cpu>=1.7.4; platform_system != "Windows"

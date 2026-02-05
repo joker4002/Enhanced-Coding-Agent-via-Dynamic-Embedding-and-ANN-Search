@@ -14,13 +14,31 @@ This repo contains scripts for:
 
 ### FAISS note (important)
 
-- On Linux/macOS, `faiss-cpu` is installed automatically from `requirements.txt`.
-- On Windows, FAISS wheels are usually not available via pip. Use **conda**:
+FAISS is required for indexing/querying (`*.index`), and can be installed in either CPU or GPU mode.
+
+- **CPU (recommended default)**
+  - Linux/macOS (pip):
+
+```powershell
+pip install -r requirements.txt -r requirements-faiss-cpu.txt
+```
+
+  - Windows (conda):
 
 ```powershell
 conda create -n ann python=3.11 -y
 conda activate ann
 conda install -c conda-forge faiss-cpu -y
+pip install -r requirements.txt
+```
+
+- **GPU (optional)**
+  - GPU builds are recommended via conda. Choose a CUDA-enabled environment that matches your driver.
+
+```powershell
+conda create -n ann-gpu python=3.11 -y
+conda activate ann-gpu
+conda install -c conda-forge faiss-gpu -y
 pip install -r requirements.txt
 ```
 
