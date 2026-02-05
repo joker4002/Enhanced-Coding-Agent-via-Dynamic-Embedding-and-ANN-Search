@@ -1,0 +1,291 @@
+repo,issue_url,comment_url,created_at,text
+pallets/flask,https://github.com/pallets/flask/issues/5897,https://github.com/pallets/flask/issues/5897#issuecomment-3800170835,2026-01-26T15:24:35+00:00,@davidism thanks for looking at this and apologies if the cut-down wasn't clear. Just to check -- does your example still not reproduce the issue if the package is installed in editable mode? (i.e: `pip install -e ./app`) For me the issue only reproduces when the package is installed in editable mode.
+pallets/flask,https://github.com/pallets/flask/issues/5897,https://github.com/pallets/flask/issues/5897#issuecomment-3807550447,2026-01-27T21:10:27+00:00,"Hrm, it turns out my original case also required a ""flat layout"" (rather than a ""src layout"") though that doesn't change anything when using a `pyproject.toml` based install. I think the conclusion here is that something about the newer style editable install sets up the paths differently, which lets the code work.
+
+I'm not sure why you were unable to reproduce the issue, though I'm happy to accept that I need to bite the bullet and change the build system in use. Thanks for investigating."
+pallets/flask,https://github.com/pallets/flask/issues/5897,https://github.com/pallets/flask/issues/5897#issuecomment-3807715716,2026-01-27T21:51:58+00:00,"Without src works for me also. Your exact example works fine, minus the legacy config I mentioned. My example was just to show what I'd do now, since there were a lot of other legacy patterns being used."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3712042611,2026-01-05T20:51:45+00:00,"https://github.com/gfmio/asyncio-gevent/issues/12#issuecomment-3058277636 seems relevant:
+
+> asyncio expects there to be a single loop (per OS thread!).
+>
+> Before patching, threading.Thread creates a new OS thread and all is fine.
+> 
+> After patching, threading.Thread will create a new green thread / greenlet running on the same OS thread. Since there is now only one OS thread, attempting to create a second loop will raise an exception."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3712548140,2026-01-06T00:13:59+00:00,"Disclaimer, I do not have a solution to offer for this problem, but I wanted to share my understanding of the issue in case it helps.
+
+The requirement for any gevent + asyncio solution to work well is that gevent runs in one thread, and asyncio runs in another thread. You can't have gevent and asyncio running on the same physical thread because then one loop would block the other.
+
+What's happening when you run the example above is that the monkey patching prevents asgiref from launching a separate asyncio thread. It thinks it is launching a new thread, but due to the monkey patching it is launching a greenlet instead. So then the asyncio loop ends up running in the same physical thread as gevent, and this is bad even without the error messages.
+
+I was actually able to get your example to run without errors only by commenting out the logic that raises the `RuntimeError` in asgiref. But this only masks the issue, it does not remove it. The correct solution would be for asgiref to somehow identify that it is running under a monkey patched gevent and figure out how to access the original unpatched threading module to launch a physical thread."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3712791799,2026-01-06T01:54:25+00:00,"Yes that's what I was starting to figure out as well. I actually stripped asgiref out for a simple `threading.Thread` in `Flask.async_to_sync` to simplify things, and the problem still occurs. I was hoping to find some way to write `async_to_sync` using Gevent, but it doesn't seem possible with how asyncio and threads work. Tried asyncio-gevent `async_to_sync` as well, but it just freezes with concurrent requests. I also tried `gevent.monkey.patch_all(threading=False)`, but that fails as well."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3714425019,2026-01-06T11:52:42+00:00,"> Individual requests do work
+
+In my opinion this needs to be investigated to be sure that it is true in all cases. A simple async view function that just sleeps works, but a view function that does real async work could have interference from monkey-patched stuff in the standard library. For example, will you be able to launch a subprocess or use the process executor from the async function? Probably not, because `subprocess` is monkey-patched by gevent. Same for anything dealing with sockets or anything else that gevent monkey-patches and asyncio expects to be unpatched.
+
+As I said above, after I commented out the `RuntimeError` in asgiref, your example runs cleanly for me. Asgiref by default runs only one asyncio thread for all the calls to `async_to_sync`, so under monkey-patching I see it create a single async loop inside a single greenlet. So at a high-level, this is all good, if you ignore that you now have a gevent loop and an asyncio loop competing with each other inside the same thread."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3719800928,2026-01-07T16:52:34+00:00,"Okay, I thought it was going to be easy to change your example and make it break, but after trying a few things I could not.
+
+I have an updated theory of why this appears to work well. Both loops are still running in the same physical thread, but the asyncio loop is using a monkey-patched selector in its scheduler, so that allows it to coexist with the gevent scheduler, with both working cooperatively, and both using greenlet-based non-blocking waits."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3719884274,2026-01-07T17:13:09+00:00,"Correction. This does appear to work with standard asyncio, but it hangs with uvloop. Below is a short demo. If you comment out the monkey patching, then the coroutine runs fine and you can Ctrl-C it.
+
+```python
+import gevent.monkey
+gevent.monkey.patch_all()
+
+import asyncio
+import threading
+import uvloop
+
+uvloop.install()
+loop = uvloop.loop.Loop()
+
+threading.Thread(target=loop.run_forever).start()
+
+async def count():
+    for i in range(5):
+        await asyncio.sleep(1)
+        print(i)
+
+asyncio.run_coroutine_threadsafe(count(), loop)
+```
+
+I don't have a Windows machine at hand right now. You should test on that OS, which uses a loop that is not based on selectors."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3720017114,2026-01-07T17:44:45+00:00,"I don't think I'm going to integrate this directly into Flask, as it requires setting up the event loop externally ahead of time. I'd also prefer to avoid gevent-specific code paths.
+
+I was thinking a new documentation page about using gevent in general and explaining the method override pattern. This would also provide an example of why `Flask.async_to_sync` is intended to be overridden, for other cases such as trio as well. If we figure anything out with uvloop, that can be shown as well."
+pallets/flask,https://github.com/pallets/flask/issues/5881,https://github.com/pallets/flask/issues/5881#issuecomment-3796959440,2026-01-25T17:02:57+00:00,"Yep, after testing, putting the following at the top works. I have no idea how to tell if it's actually more performant than the default though.
+
+```python
+import gevent
+gevent.config.loop = ""libuv""
+```"
+pallets/flask,https://github.com/pallets/flask/issues/5870,https://github.com/pallets/flask/issues/5870#issuecomment-3690159511,2025-12-24T16:01:34+00:00,"From the [docs](https://flask.palletsprojects.com/en/stable/reqcontext/#teardown-callbacks) about teardown callbacks:
+
+> Be sure to write these functions in a way that does not depend on other callbacks and will not fail.
+
+Teardown happens after the response has already started, so there's no way to indicate that there was a server error at that point except by crashing. If we silently ignored exceptions in these handlers, the app could end up in an unexpected state."
+pallets/flask,https://github.com/pallets/flask/issues/5863,https://github.com/pallets/flask/issues/5863#issuecomment-3656561738,2025-12-15T16:32:26+00:00,"> Handling Missing Headers: Current proposal allows requests with valid Origin header when Sec-Fetch-Site is missing. Should this be configurable or should we reject outright?
+
+Requiring `Origin` seems like a massive breaking change for APIs (where CSRF is generally not an issue anyway since you need to provide a Bearer token for authentication, or for unauthenticated APIs that do not require CSRF protections).
+
+So default-on would likely be a breaking change."
+pallets/flask,https://github.com/pallets/flask/issues/5863,https://github.com/pallets/flask/issues/5863#issuecomment-3656598856,2025-12-15T16:38:36+00:00,"> > Handling Missing Headers: Current proposal allows requests with valid Origin header when Sec-Fetch-Site is missing. Should this be configurable or should we reject outright?
+> 
+> Requiring `Origin` seems like a massive breaking change for APIs (where CSRF is generally not an issue anyway since you need to provide a Bearer token for authentication, or for unauthenticated APIs that do not require CSRF protections).
+> 
+> So default-on would likely be a breaking change.
+
+The algorithm I was hoping to implement was Filippo's recommended appraoch:
+
+1. Allow safe methods (GET, HEAD, OPTIONS)
+2. If Origin in trusted list → allow
+3. If Sec-Fetch-Site present:
+   - same-origin or none → allow
+   - same-site or cross-site → REJECT
+4. If neither header present → allow (not a browser)
+5. If Origin host == Host → allow, else reject
+
+Based on this.
+
+**What gets rejected:**
+
+- Browser requests where Sec-Fetch-Site is cross-site or same-site
+- Browser requests where Origin is present but doesn't match Host (old browsers)
+
+**What gets allowed:**
+
+- Sec-Fetch-Site: same-origin (browser, same origin)
+- Sec-Fetch-Site: none (browser, user-initiated like bookmarks)
+- No Sec-Fetch-Site + no Origin (not a browser — API clients)
+- No Sec-Fetch-Site + Origin matches Host (old browser, same origin)
+- Any request to a trusted origin in CSRF_TRUSTED_ORIGINS 
+
+So default-on should not break APIs at all. The protection only kicks in when browser-specific headers are present and indicate a cross-origin request.
+
+Does this address your concern, or am I missing an edge case?"
+pallets/flask,https://github.com/pallets/flask/issues/5863,https://github.com/pallets/flask/issues/5863#issuecomment-3661305957,2025-12-16T16:08:00+00:00,"@davidism Here's how I was thinking of implementing this.
+
+**Option 1: Flask + Werkzeug implementation**
+
+1. Accept csrf as a parameter to `@app.route | @blueprint.route` but will still be in `**options` kwargs
+2. `werkzeug.routing.Rule` [class](https://github.com/pallets/werkzeug/blob/a9f6b3c7924912e62ea74f39f10fb611d6e7725e/src/werkzeug/routing/rules.py#L459-L473) to have the argument `csrf` and attribute `csrf` 
+3. In `flask.App.full_dispatch_request`, call `self.check_csrf(ctx.request)` after `request_started.send` and before `self.preprocess_request` 
+
+https://github.com/pallets/flask/blob/2579ce9f18e67ec3213c6eceb5240310ccd46af8/src/flask/app.py#L1001-L1002
+
+**Option 2: Flask only implementation**
+
+1. Same as above
+2. Instead of adding argument to `werkzeug.routing.Rule`, just set `rule_obj.csrf = options.get(""csrf"")` similar to how `provide_automatic_options` is set.
+3. Same as above 
+
+https://github.com/pallets/flask/blob/2579ce9f18e67ec3213c6eceb5240310ccd46af8/src/flask/sansio/app.py#L647-L648
+
+---
+
+**On exempt paths:** This approach avoids the ""separate map of exempt paths"" problem entirely. Since `csrf` is stored on the `Rule` object itself, we just check `request.url_rule.csrf` at dispatch time requiring no separate data structure to sync.
+
+**On `TRUSTED_HOSTS` vs origins:** You're right, they're different. So I'd keep them separate:
+
+- `TRUSTED_HOSTS`: existing, for [Host header validation](https://flask.palletsprojects.com/en/stable/api/#flask.Request.trusted_hosts)
+- `CSRF_TRUSTED_ORIGINS`: new, full origins for cross-origin allowlist (OAuth callbacks, etc.)
+
+**On Werkzeug vs Flask:** I lean toward Option 2 (Flask only) since:
+- The check logic references Flask's `app.config` for `CSRF_TRUSTED_ORIGINS`
+- It follows the `provide_automatic_options` precedent
+- Werkzeug stays transport-layer focused
+
+The core check logic (~40 lines) could still live in Werkzeug as a utility function that Flask calls, if you want other frameworks to benefit. But the routing integration feels Flask-specific.
+
+Want me to put together a draft PR for Option 2?"
+pallets/flask,https://github.com/pallets/flask/issues/5861,https://github.com/pallets/flask/issues/5861#issuecomment-3649220777,2025-12-13T11:07:07+00:00,"@ThiefMaster 
+Yes, so I've already created it, and I'd like to discuss here what features would be useful."
+pallets/flask,https://github.com/pallets/flask/issues/5839,https://github.com/pallets/flask/issues/5839#issuecomment-3470371619,2025-10-30T21:38:48+00:00,"Also, your webserver should typically be configured with sane limits. In fact, the code in your function won't even run until the file has been uploaded."
+pallets/flask,https://github.com/pallets/flask/issues/5839,https://github.com/pallets/flask/issues/5839#issuecomment-3470506696,2025-10-30T22:39:08+00:00,"Regardless of frustration you may be feeling, your approach to reporting this issue and asking for help was not acceptable. Please reflect on how you'd like people to interact with you, then apply that to future interactions with others."
+pallets/flask,https://github.com/pallets/flask/issues/5836,https://github.com/pallets/flask/issues/5836#issuecomment-3509562075,2025-11-10T06:04:07+00:00,"@davidism I am on the fence, should this bug hold up releasing click 8.3.1?"
+pallets/flask,https://github.com/pallets/flask/issues/5825,https://github.com/pallets/flask/issues/5825#issuecomment-3685573340,2025-12-23T07:42:23+00:00,"Hi, I’d like to work on this documentation issue.I’ll review the “receiving JSON” section and add clarification about when and why
+a 415 (Unsupported Media Type) error occurs, along with an example if appropriate."
+pallets/flask,https://github.com/pallets/flask/issues/5825,https://github.com/pallets/flask/issues/5825#issuecomment-3703489635,2026-01-01T09:57:17+00:00,"Hi, I looked into this issue and it appears to be related to how Flask handles
+request.get_json() when the Content-Type header is missing or incorrect.
+
+From reading the documentation, the 415 error can occur when a request does
+not specify 'application/json' or sends invalid JSON, but this behavior is
+not clearly explained for users.
+
+Adding a short explanation and a simple example to the
+request.get_json() documentation (in docs/reqcontext.rst) should help
+users understand why this error occurs and how to resolve it.
+
+Please let me know if this approach makes sense before I proceed."
+pallets/flask,https://github.com/pallets/flask/issues/5817,https://github.com/pallets/flask/issues/5817#issuecomment-3299257146,2025-09-16T15:19:23+00:00,"~~Oh no, it actually works with uwsgi.~~
+It doesn't work either with uwsgi
+```
+RuntimeError: You cannot use AsyncToSync in the same thread as an async event loop - just await the async function directly.
+```"
+pallets/flask,https://github.com/pallets/flask/issues/5817,https://github.com/pallets/flask/issues/5817#issuecomment-3312326834,2025-09-19T14:02:01+00:00,It would be helpful if you showed a minimal example of what you are using using that causes issues.
+pallets/flask,https://github.com/pallets/flask/issues/5817,https://github.com/pallets/flask/issues/5817#issuecomment-3314181146,2025-09-19T23:32:18+00:00,@pgjones could you take a look at this if you have a chance?
+pallets/flask,https://github.com/pallets/flask/issues/5816,https://github.com/pallets/flask/issues/5816#issuecomment-3504916542,2025-11-07T20:56:09+00:00,"@davidism Would you assign this to me?
+I am interested in contributing to this."
+pallets/flask,https://github.com/pallets/flask/issues/5816,https://github.com/pallets/flask/issues/5816#issuecomment-3517944440,2025-11-11T17:13:32+00:00,"Hi @davidism,
+I’ve been going through the context preservation and teardown logic in Flask and would love to contribute to this issue.
+I understand this task was marked as not suitable for new contributors, but I have experience with Python internals and would like to work carefully under your guidance.
+
+I’ve already explored how should_ignore_error interacts with teardown handlers and can open a draft PR showing a safe deprecation path (with tests).
+
+Would you be open to me working on this?"
+pallets/flask,https://github.com/pallets/flask/issues/5815,https://github.com/pallets/flask/issues/5815#issuecomment-3308554602,2025-09-18T16:56:11+00:00,"It may be very difficult to do this in a way that existing overridden code will not fail and will show a deprecation warning.
+
+We want to upgrade an overridden method that does not take the new `ctx: AppContext` parameter. We can detect this in `__init_subclass__` with `inspect.signature`, and wrap the function to take the correct signature, so that other parts of the dispatch code will call it correctly. But that's the ""simple"" part.
+
+What if other user code is still calling the method, overridden or not, without the new argument? The most obvious way this happens is with `super().method` within the overridden method. The wrapper could perhaps be clever enough to check the type of the first argument, and decide to make a new or old signature call. The wrapper would have to be applied to every base method to handle the `super` call case.
+
+I haven't tried to write this more complex wrapper yet. I have a feeling it will be difficult to write. I know it will add overhead to every request, since multiple methods will now have to do detection on the arguments passed to them. This overhead will mostly be waste, as the vast majority of code will not be overridden.
+
+Perhaps we can just say this is a breaking change in 4.0? I still think the result is worth it. We could still show a better error message by doing some detection in `__init_subclass__`, but showing an error instead of applying a wrapper and showing a warning."
+pallets/flask,https://github.com/pallets/flask/issues/5815,https://github.com/pallets/flask/issues/5815#issuecomment-3308868579,2025-09-18T18:04:34+00:00,"The following method signatures would change to add `ctx: AppContext` as the first parameter:
+
+- `update_template_context`
+- `handle_http_exception`
+- `handle_user_exception`
+- `handle_exception`
+- `log_exception`
+- `dispatch_request`
+- `full_dispatch_request`
+- `finalize_request`
+- `make_default_options_response`
+- `preprocess_request`
+- `process_response`
+- `do_teardown_request`
+- `do_teardown_appcontext`
+
+I'd be somewhat surprised to find any of these overridden. They're either really internal, or they're the machinery that calls registered callback functions."
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3288692782,2025-09-13T18:05:39+00:00,"This will be fixed as a side effect of #5812 in 3.2. I'm not sure how to fix it in the mean time, without reintroducing the other issue, but I'm open to reviewing a PR if you can figure it out sooner.
+
+I do understand how this is an issue, but note that the docs already call out that you can't make assumptions about how many times teardown functions will run or what will have or have not run before them. That's something you should address regardless of this being fixed."
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3292350761,2025-09-15T14:05:20+00:00,"> This will be fixed as a side effect of https://github.com/pallets/flask/pull/5812 in 3.2. I'm not sure how to fix it in the mean time
+
+Seems like it does the trick indeed, thanks. The fact that it won't be fixed until then is not really an issue for us, I've just pinned flask to <3.1.2 until we can upgrade.
+
+> the docs already call out that you can't make assumptions about how many times teardown functions will run or what will have or have not run before them
+
+https://flask.palletsprojects.com/en/stable/reqcontext/#teardown-callbacks here ? It's not immediately obvious to me that they could run more than once, but even then this isn't the original issue we encountered, because our teardown callbacks are indeed idempotent — the `g.pop()` was used here to exhibit the issue.
+
+My issue was more around *when* it can be called: in this specific case, even before entering the generator passed to `stream_with_context()`. I wouldn't expect a teardown callback to be called at this point, considering `do_teardown_request()` is « Called after the request is dispatched and the response is returned »."
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3322169181,2025-09-23T02:46:59+00:00,Is there an expected release date for 3.2.0? We also encountered this problem in OTEL.
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3348322234,2025-09-29T18:02:26+00:00,"I think we should supress the error as a warning till the issue gets resolves as a side effect by wrapping the 
+teardown call on the lines of:
+
+from contextlib import suppress
+
+def do_teardown_request(self, exc: BaseException | None = None) -> None:
+    """"""Called after the request is dispatched and the response is finalized.""""""
+    req = _cv_app.get().request
+
+    for name in chain(req.blueprints, (None,)):
+        if name in self.teardown_request_funcs:
+            for func in reversed(self.teardown_request_funcs[name]):
+                with suppress(KeyError):
+                    self.ensure_sync(func)(exc)
+
+    request_tearing_down.send(self, _async_wrapper=self.ensure_sync, exc=exc)"
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3665784285,2025-12-17T15:09:18+00:00,"We are suffering the same issue with 3.1.2, and had to pin Flask to version < 3.1.2.
+Did not quite get it: is this expected to be resolved in Flask 3.2.0? 
+Thanks"
+pallets/flask,https://github.com/pallets/flask/issues/5804,https://github.com/pallets/flask/issues/5804#issuecomment-3665928055,2025-12-17T15:38:24+00:00,"> is this expected to be resolved in Flask 3.2.0?
+
+yes"
+pallets/flask,https://github.com/pallets/flask/issues/5786,https://github.com/pallets/flask/issues/5786#issuecomment-3197466823,2025-08-18T15:46:31+00:00,"I tracked this down to how the request context is being restored by the client. It was entering them in the reverse order, newest to oldest instead of oldest to newest. Therefore the first request's session was at the top of the stack, obscuring the second request."
+pallets/flask,https://github.com/pallets/flask/issues/5774,https://github.com/pallets/flask/issues/5774#issuecomment-3198514429,2025-08-18T21:43:27+00:00,"Never mind, this is a specific fixable issue with `stream_with_context`, not an issue with async views. Thanks for finding the PR that affected it, when I took another look at this it put me on the right path.
+
+The problem is related to how we automatically push an app context when pushing a request context. If an app context is not already pushed, we create one and push it, recording that we should pop it when the request context is popped. We store this using `ContextVars`, which are sensitive to the async loop/thread they were modified from. The order that pushes and pops happens in is important, and is pretty complex when dealing with the request/response, stream with context, and test client context preservation all at once.
+
+The immediate issue you reported is because of when `stream_with_context` was pushing the request. It would push it as soon as the generator started, and in the case of an async view it is running in a temporary async loop context only for that view function. Therefore, when we went to pop it later during cleanup and test client, the context it was pushed in no longer matched the current context.
+
+That can be fixed by adjusting when the context is pushed to when the streaming response starts, rather than when the generator starts. But this resulted in another error, because at that point the app context had already been cleaned up, but recorded for client preservation. So the generator would automatically push a new app context, then things would get cleaned up in the wrong order.
+
+That can be fixed by pushing the app and request contexts separately in `stream_with_context`, so that the request context will not automatically add or clean up the app context.
+
+There's a comment in `stream_with_context` saying that pushing at the point it was is intentional and required for correct operation. But as far as I can tell with further test scenarios, everything works correctly with the change. Perhaps it was required before that PR changed how things worked.
+
+Phew 😮‍💨"
+pallets/flask,https://github.com/pallets/flask/issues/5768,https://github.com/pallets/flask/issues/5768#issuecomment-3053163642,2025-07-09T15:51:47+00:00,"Can I assume that any feature request from the community will simply be closed as 'not planned'? 
+Is there a process or criteria for what gets considered?"
+pallets/flask,https://github.com/pallets/flask/issues/5751,https://github.com/pallets/flask/issues/5751#issuecomment-2934757408,2025-06-03T11:18:10+00:00,"You'll want to use `werkzeug.Response` for most annotations. Specificially for `redirect`, that's what it returns. `flask.Response` is a subclass, meaning it's not valid in that typing context. This is in general impossible to solve, we've gone back and forth before and it causes issues in user code no matter whether we use Flask's or Werkzeug's `Response` in our own annotations."
+pallets/flask,https://github.com/pallets/flask/issues/5738,https://github.com/pallets/flask/issues/5738#issuecomment-2893924221,2025-05-20T11:02:12+00:00,"@ThiefMaster Do you mean by setting different blueprints to different templates? 
+I believe this has its limitations if so"
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2880813090,2025-05-14T16:14:54+00:00,"@davidism 
+Hi! 👋 I'm new to contributing to Flask and really interested in getting involved in the project.
+This issue looks like something I could help with and learn from — would it be okay if I took it on?
+
+I'm not entirely sure whether this suggestion aligns with Flask’s design philosophy and consistency with similar decorators. If it's confirmed that this is a change the team would consider, I’d love to help implement it.
+
+Could I be assigned as the assignee for this issue?
+
+Thanks!"
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2887347838,2025-05-16T17:51:48+00:00,"@alexwlchan is it okay if i take up this issue? I understand from `https://palletsprojects.com/contributing` that I don't have to ask first but I thought it would be a good idea to do so out of courtesy anyway, if you could assign me. Thanks!"
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2887355138,2025-05-16T17:55:52+00:00,"Not the author of the issue (not sure why you pinged him) but a maintainer: Yes sure, feel free to work on it. PRs to fix bugs are always welcome!"
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2901346515,2025-05-22T14:01:22+00:00,"Hi there! 
+
+I'm keen to start contributing to Flask and this issue caught my eye. It seems like a great way for me to get familiar with the project.
+If addressing this decorator behavior fits the team's vision for Flask's design, I'd be happy to take it on. Could I get assigned?
+
+Thanks!"
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2901357629,2025-05-22T14:04:37+00:00,There's already a draft PR for this... why do you want to start working on yet another one while there's an open PR? :)
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2901382680,2025-05-22T14:12:03+00:00,"> There's already a draft PR for this... why do you want to start working on yet another one while there's an open PR? :)
+
+    Thanks for letting me know... I appreciate the heads-up about the existing draft PR. I'll definitely find another issue to work on."
+pallets/flask,https://github.com/pallets/flask/issues/5729,https://github.com/pallets/flask/issues/5729#issuecomment-2901384109,2025-05-22T14:12:27+00:00,"What is it about this that has attracted _five_ completely new contributors who aren't reading the [contributing guide](https://palletsprojects.com/contributing):
+
+> Anyone is welcome to work on any open ticket in any project's issue tracker, without asking first. Before starting, check if anyone else is assigned to the issue, or if there are any linked open pull requests. Look through the issue for that information as well as discussion and other linked issues for context."
+pallets/flask,https://github.com/pallets/flask/issues/5718,https://github.com/pallets/flask/issues/5718#issuecomment-2833241276,2025-04-27T06:58:25+00:00,"Hi, I’m new to open source and would like to work on this issue. Can I take it?"
+pallets/flask,https://github.com/pallets/flask/issues/5718,https://github.com/pallets/flask/issues/5718#issuecomment-2847789749,2025-05-02T17:57:59+00:00,"Thanks for the contribution and this looks great! I appreciate the clean and thoughtful write-up.
+
+Glad to see the issue addressed this thoroughly. Let me know if I can help further."
+pallets/flask,https://github.com/pallets/flask/issues/5692,https://github.com/pallets/flask/issues/5692#issuecomment-2736265866,2025-03-19T11:18:02+00:00,"Is there a specific reason why you need to use an alpha build of Python?
+
+Also, see:
+
+https://peps.python.org/pep-0745/
+https://palletsprojects.com/releases"
+pallets/flask,https://github.com/pallets/flask/issues/5692,https://github.com/pallets/flask/issues/5692#issuecomment-2736289763,2025-03-19T11:27:17+00:00,"I should have been more verbose in justification. Yes, my intention is to make you aware of the issue coming soon - there will only be one more alpha release in ~month. In Fedora, we're testing from the 1st alpha of a new Python release, to make sure the ecosystem is gradually ready from the day of release."
