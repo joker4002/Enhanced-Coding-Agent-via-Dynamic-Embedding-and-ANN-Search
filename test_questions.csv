@@ -1,0 +1,117 @@
+id,repo,discussion_number,url,question
+pallets/flask:5894,pallets/flask,5894,https://github.com/orgs/pallets/discussions/5894,Issue with send_file() and send_from_directory() not sending
+pallets/flask:5740,pallets/flask,5740,https://github.com/orgs/pallets/discussions/5740,How to use g in generator?
+pallets/flask:5773,pallets/flask,5773,https://github.com/orgs/pallets/discussions/5773,Why does my Flask route return a 405 error when I submit a form?
+pallets/flask:5015,pallets/flask,5015,https://github.com/orgs/pallets/discussions/5015,UserWarning: The setup method 'route' can no longer be called on the blueprint 'auth'
+pallets/flask:5684,pallets/flask,5684,https://github.com/orgs/pallets/discussions/5684,version policy
+pallets/flask:5656,pallets/flask,5656,https://github.com/orgs/pallets/discussions/5656,app.run(debug=True)，会导致flask_sqlalchemy错误!
+pallets/flask:5612,pallets/flask,5612,https://github.com/orgs/pallets/discussions/5612,Flask+HTML autocomplete extensions for VS Code
+pallets/flask:4163,pallets/flask,4163,https://github.com/orgs/pallets/discussions/4163,How to manage setup/teardown of resources in async views?
+pallets/flask:5534,pallets/flask,5534,https://github.com/orgs/pallets/discussions/5534,Concurrent Request Processing Issue in Flask with Gunicorn and Gevent-Websocket on AWS
+pallets/flask:5507,pallets/flask,5507,https://github.com/orgs/pallets/discussions/5507,Clarify semantics of app context
+pallets/flask:5520,pallets/flask,5520,https://github.com/orgs/pallets/discussions/5520,Optimisation in deployment
+pallets/flask:5518,pallets/flask,5518,https://github.com/orgs/pallets/discussions/5518,Flask ready command
+pallets/flask:4790,pallets/flask,4790,https://github.com/orgs/pallets/discussions/4790,runtime exception on flask/global.py
+pallets/flask:5132,pallets/flask,5132,https://github.com/orgs/pallets/discussions/5132,"After switching to latest flask, app timeouts on some requests"
+pallets/flask:5454,pallets/flask,5454,https://github.com/orgs/pallets/discussions/5454,How to get request's path with parameter not substituted?
+pallets/flask:5441,pallets/flask,5441,https://github.com/orgs/pallets/discussions/5441,Does Flask suffer of the problem of useless order by on some ORM prefetches ?
+pallets/flask:5439,pallets/flask,5439,https://github.com/orgs/pallets/discussions/5439,KeyError-  KeyError: 'name'
+pallets/flask:5429,pallets/flask,5429,https://github.com/orgs/pallets/discussions/5429,Load config file which is located outside package directory
+pallets/flask:5394,pallets/flask,5394,https://github.com/orgs/pallets/discussions/5394,Error handling in send_file
+pallets/flask:5390,pallets/flask,5390,https://github.com/orgs/pallets/discussions/5390,appropriate citation for Flask module?
+pallets/flask:5365,pallets/flask,5365,https://github.com/orgs/pallets/discussions/5365,Getting Error - TemplateNotFound(template)
+pallets/flask:5358,pallets/flask,5358,https://github.com/orgs/pallets/discussions/5358,Is Flask 2 support over?
+pallets/flask:5339,pallets/flask,5339,https://github.com/orgs/pallets/discussions/5339,Change Authorization in the header before request
+pallets/flask:5321,pallets/flask,5321,https://github.com/orgs/pallets/discussions/5321,ModuleNotFoundError: No module named 'flask._compat' in Flask 3.0.0
+pallets/flask:5261,pallets/flask,5261,https://github.com/orgs/pallets/discussions/5261,Custom request-scoped global proxy with Flask 2.3
+pallets/flask:5290,pallets/flask,5290,https://github.com/orgs/pallets/discussions/5290,Why doesn't flask set an upper bound for any dependencies?
+pallets/flask:4929,pallets/flask,4929,https://github.com/orgs/pallets/discussions/4929,Using celery with flask application factory pattern
+pallets/flask:4901,pallets/flask,4901,https://github.com/orgs/pallets/discussions/4901,JavaScript file upload
+pallets/flask:5033,pallets/flask,5033,https://github.com/orgs/pallets/discussions/5033,Possible to coexist send_file() and json object in `return ...`?
+pallets/flask:5208,pallets/flask,5208,https://github.com/orgs/pallets/discussions/5208,Is `any` converter supported officially?
+pallets/flask:5179,pallets/flask,5179,https://github.com/orgs/pallets/discussions/5179,Good practices with converters and `before_request`
+pallets/flask:5151,pallets/flask,5151,https://github.com/orgs/pallets/discussions/5151,Failing to install the my project in the virtual environment
+pallets/flask:5166,pallets/flask,5166,https://github.com/orgs/pallets/discussions/5166,Blueprint before_app_first_request vs record_once usage discrepancy
+pallets/flask:5156,pallets/flask,5156,https://github.com/orgs/pallets/discussions/5156,FLASK_APP is unavailable when FlaskGroup is not used
+pallets/flask:5145,pallets/flask,5145,https://github.com/orgs/pallets/discussions/5145,Resolving indirect and direct (ciruclar) dependencies between extensions
+pallets/flask:5143,pallets/flask,5143,https://github.com/orgs/pallets/discussions/5143,How work the upload chain ?
+pallets/flask:5114,pallets/flask,5114,https://github.com/orgs/pallets/discussions/5114,Trigger a function for all the endpoint ?
+pallets/flask:5137,pallets/flask,5137,https://github.com/orgs/pallets/discussions/5137,DataBase in Flask
+pallets/flask:5130,pallets/flask,5130,https://github.com/orgs/pallets/discussions/5130,Sending 204 when event/stream is done?
+pallets/flask:4660,pallets/flask,4660,https://github.com/orgs/pallets/discussions/4660,What is the best way to programmatically know what module to set `FLASK_APP` to?
+pallets/flask:5128,pallets/flask,5128,https://github.com/orgs/pallets/discussions/5128,cli App Generation with Default File structuring
+pallets/flask:5115,pallets/flask,5115,https://github.com/orgs/pallets/discussions/5115,Stuck at Flask-2.2.5 with urllib3-1.26.15 -- Flask-2.3.x with urllib3-1.xx or 2.xx dont work
+pallets/flask:5092,pallets/flask,5092,https://github.com/orgs/pallets/discussions/5092,How to set a timeout for user ?
+pallets/flask:5095,pallets/flask,5095,https://github.com/orgs/pallets/discussions/5095,json format after 2.3.x
+pallets/flask:5065,pallets/flask,5065,https://github.com/orgs/pallets/discussions/5065,Can we natively make a request to an external API ?
+pallets/flask:5064,pallets/flask,5064,https://github.com/orgs/pallets/discussions/5064,not found Error while running a flask app
+pallets/flask:5042,pallets/flask,5042,https://github.com/orgs/pallets/discussions/5042,Cookie expire at Session instead of date.
+pallets/flask:5030,pallets/flask,5030,https://github.com/orgs/pallets/discussions/5030,Help with extending an extension
+pallets/flask:5027,pallets/flask,5027,https://github.com/orgs/pallets/discussions/5027,How get user IP when using a 'Proxy'
+pallets/flask:5019,pallets/flask,5019,https://github.com/orgs/pallets/discussions/5019,Flask-RESTful dependence on Flask 2.3 deprecated propagated_exceptions
+pallets/flask:5016,pallets/flask,5016,https://github.com/orgs/pallets/discussions/5016,When is 2.3 scheduled for release?
+pallets/flask:5012,pallets/flask,5012,https://github.com/orgs/pallets/discussions/5012,On DEBUG mode my functions is called twice instead of once
+pallets/flask:4961,pallets/flask,4961,https://github.com/orgs/pallets/discussions/4961,Follow discussion by RSS.
+pallets/flask:4978,pallets/flask,4978,https://github.com/orgs/pallets/discussions/4978,before_first_request and url_for
+pallets/flask:4793,pallets/flask,4793,https://github.com/orgs/pallets/discussions/4793,Unable to init_db in tutorial: Working outsite of application context
+pallets/flask:4896,pallets/flask,4896,https://github.com/orgs/pallets/discussions/4896,Flask 2.0 Async Not working
+pallets/flask:4886,pallets/flask,4886,https://github.com/orgs/pallets/discussions/4886,airflow 2.4.2 - TypeError occurs (TypeError: wrapper() takes 1 positional argument but 2 were given)
+pallets/flask:4878,pallets/flask,4878,https://github.com/orgs/pallets/discussions/4878,Reload changes from config.py
+pallets/flask:4838,pallets/flask,4838,https://github.com/orgs/pallets/discussions/4838,Accept requests from multiple users
+pallets/flask:4822,pallets/flask,4822,https://github.com/orgs/pallets/discussions/4822,cannot import name 'soft_unicode' from 'markupsafe' (U:\Python\Python310\lib\site-packages\markupsafe\__init__.py)
+pallets/flask:4820,pallets/flask,4820,https://github.com/orgs/pallets/discussions/4820,Could or would it be possible to use a flask in snakeware-os?
+pallets/flask:4805,pallets/flask,4805,https://github.com/orgs/pallets/discussions/4805,flask subdomain url_for  static not working
+pallets/flask:4803,pallets/flask,4803,https://github.com/orgs/pallets/discussions/4803,New bug that never happen in previous version
+pallets/flask:4785,pallets/flask,4785,https://github.com/orgs/pallets/discussions/4785,Registering sqlalchemy engine events
+pallets/flask:4727,pallets/flask,4727,https://github.com/orgs/pallets/discussions/4727,2.2.0 bug: type object 'Flask' has no attribute 'try_trigger_before_first_request_functions'
+pallets/flask:4717,pallets/flask,4717,https://github.com/orgs/pallets/discussions/4717,Publish websites on TOR only. Do nginx make sense ?
+pallets/flask:4700,pallets/flask,4700,https://github.com/orgs/pallets/discussions/4700,Adding new endpoint to flask app without killing existing processes
+pallets/flask:4690,pallets/flask,4690,https://github.com/orgs/pallets/discussions/4690,Getting error when sending large file to flask - json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+pallets/flask:4565,pallets/flask,4565,https://github.com/orgs/pallets/discussions/4565,Is it possible to distinguish two variable with same data type in URL?
+pallets/flask:4554,pallets/flask,4554,https://github.com/orgs/pallets/discussions/4554,Flask[async] and requirements.txt
+pallets/flask:4478,pallets/flask,4478,https://github.com/orgs/pallets/discussions/4478,Nested flask.cli commands
+pallets/flask:4508,pallets/flask,4508,https://github.com/orgs/pallets/discussions/4508,wrappers.py:129: BadRequest flask:2.0.3
+pallets/flask:4493,pallets/flask,4493,https://github.com/orgs/pallets/discussions/4493,test-basic.py test case 1 // 0
+pallets/flask:4475,pallets/flask,4475,https://github.com/orgs/pallets/discussions/4475,ToDo List?
+pallets/flask:4441,pallets/flask,4441,https://github.com/orgs/pallets/discussions/4441,Flask 2.0.3 release
+pallets/flask:4440,pallets/flask,4440,https://github.com/orgs/pallets/discussions/4440,Best web server to deploy flask app on windows
+pallets/flask:4354,pallets/flask,4354,https://github.com/orgs/pallets/discussions/4354,Is there any way to bypass .config when using flask Blueprint?
+pallets/flask:4345,pallets/flask,4345,https://github.com/orgs/pallets/discussions/4345,Feature Request: Can a PDF for Flack2.0 Docs be created on: flask.palletsprojects.com webpage?
+pallets/flask:4275,pallets/flask,4275,https://github.com/orgs/pallets/discussions/4275,Imports inside application factory
+pallets/flask:4247,pallets/flask,4247,https://github.com/orgs/pallets/discussions/4247,git commands for contributing in Flask
+pallets/flask:4244,pallets/flask,4244,https://github.com/orgs/pallets/discussions/4244,When will 2.0.2 Be Released
+pallets/flask:4235,pallets/flask,4235,https://github.com/orgs/pallets/discussions/4235,Set host for every route in one place?
+pallets/flask:4228,pallets/flask,4228,https://github.com/orgs/pallets/discussions/4228,Best way to parse the user_agent property?
+pallets/flask:4225,pallets/flask,4225,https://github.com/orgs/pallets/discussions/4225,Is the pip install command case-sensitive?
+pallets/flask:4178,pallets/flask,4178,https://github.com/orgs/pallets/discussions/4178,How do I have an error handler that's only used for a specific endpoint?
+pallets/flask:4177,pallets/flask,4177,https://github.com/orgs/pallets/discussions/4177,Make an entire directory accessible
+pallets/flask:4136,pallets/flask,4136,https://github.com/orgs/pallets/discussions/4136,Retrieval / comparison of Flask application static content endpoint(s)
+docs:243f1fe848eb,pallets/flask,,d:\499\docs\appcontext.rst,"Why does Flask need an App Context and a Request Context, and what proxies (e.g., current_app, g, request, session) does each one provide?"
+docs:403ea318f085,pallets/flask,,d:\499\docs\appcontext.rst,"Why does accessing current_app or g outside a view function raise 'Working outside of application context', and what is the correct way to fix it?"
+docs:504af3870ad5,pallets/flask,,d:\499\docs\appcontext.rst,"In unit tests, when should you use test_client versus test_request_context, and what is the difference between them?"
+docs:f6e85686674f,pallets/flask,,d:\499\docs\appcontext.rst,"In what situations do you need to use LocalProxy._get_current_object, and what happens if you pass request proxies across threads or coroutines?"
+docs:ef3aa315d1b2,pallets/flask,,d:\499\docs\lifecycle.rst,"In a request lifecycle, what is the execution order of before_request / view / after_request / teardown_request, and which steps are affected by exceptions?"
+docs:6cce638b1808,pallets/flask,,d:\499\docs\api.rst,"Why is Flask's session implemented as a 'signed cookie', what does it prevent the user from doing, and what does it not prevent?"
+docs:3d514537cea4,pallets/flask,,d:\499\docs\api.rst,"Why might Flask not detect in-place mutations of mutable session values (list/dict), and what does the documentation recommend to handle this?"
+docs:f5635624b031,pallets/flask,,d:\499\docs\api.rst,"What behaviors can you replace by customizing Flask's session interface (SessionInterface), and when would you need a custom session backend?"
+docs:7e44710c39aa,pallets/flask,,d:\499\docs\async-await.rst,"How do async view functions run under WSGI in Flask, where is the event loop started, and how is it stopped?"
+docs:f5b4f1e9b55c,pallets/flask,,d:\499\docs\async-await.rst,"Why is it discouraged to create background tasks with asyncio.create_task inside Flask async views, and what are the correct alternatives?"
+docs:9cec39143995,pallets/flask,,d:\499\docs\async-await.rst,"If a project is mostly async code, why does the documentation suggest considering Quart instead of Flask, and what are the fundamental concurrency model differences?"
+docs:9a6b7effc6b3,pallets/flask,,d:\499\docs\async-await.rst,"How can extension authors use Flask.ensure_sync to support async views, and what are the limits of ensure_sync?"
+docs:b6cffbb3f4a6,pallets/flask,,d:\499\docs\blueprints.rst,"What architectural problems are Blueprints meant to solve, and how are they different from a 'pluggable app'?"
+docs:7c4e547e428b,pallets/flask,,d:\499\docs\blueprints.rst,"Can a Blueprint be registered multiple times, and if it is registered multiple times with different url_prefix values, how does that affect endpoint naming and URL generation?"
+docs:a531e899d178,pallets/flask,,d:\499\docs\api.rst,"What are the three ways to register routes (route / add_url_rule / directly manipulating url_map), and when is each appropriate?"
+docs:e4d00a6b2ad8,pallets/flask,,d:\499\docs\api.rst,"What are Flask's automatic redirect rules for trailing slashes, and why do they help keep URLs unique?"
+docs:c5c4063f2f3b,pallets/flask,,d:\499\docs\api.rst,"What problems do Flask's built-in URL converters (string/int/float/path/uuid/any) solve, and how do you define a custom converter?"
+docs:be061774f52e,pallets/flask,,d:\499\docs\signals.rst,"What problem does Flask's signaling mechanism solve, and why do signals depend on Blinker?"
+docs:d2b6881a67a9,pallets/flask,,d:\499\docs\api.rst,"When does the template_rendered signal fire, and what observability/auditing use cases can subscribing to it support?"
+docs:931bc8324d9b,pallets/flask,,d:\499\docs\cli.rst,"Why do many Flask CLI commands need an app context, and what does the with_appcontext decorator do?"
+docs:df867111da24,pallets/flask,,d:\499\docs\cli.rst,"How does Flask CLI decide which application instance to load (e.g., via FLASK_APP or a factory), and what are common reasons app discovery fails?"
+docs:e8f9ad696acb,pallets/flask,,d:\499\docs\config.rst,"What configuration sources does Flask's Config system support (object/file/environment variables/etc.), and how can you avoid configuration confusion across environments?"
+docs:82965780331f,pallets/flask,,d:\499\docs\debugging.rst,"Why should Debug Mode not be enabled in production, and what specific risks does it expose?"
+docs:7f2f9be2ba46,pallets/flask,,d:\499\docs\errorhandling.rst,"What is Flask's error handling flow, and how do abort(), HTTPException, and errorhandler work together?"
+docs:c0c5781633ce,pallets/flask,,d:\499\docs\testing.rst,"In Flask testing, how do you manage request context push/pop, and why do some tests need to preserve context or clean it up manually?"
+docs:1471e4fe9fd7,pallets/flask,,d:\499\docs\testing.rst,"What are FlaskClient and FlaskCliRunner used to test, respectively, and how do you assert responses and CLI output in tests?"
+docs:2665723ecef2,pallets/flask,,d:\499\docs\templating.rst,"What is the relationship between Flask template rendering and Jinja, and how do you control template loading paths and autoescape behavior?"
+docs:84936503a3e1,pallets/flask,,d:\499\docs\logging.rst,"How should logging be configured in a Flask app (app.logger / handlers / formatters), and why is using print unreliable?"
+docs:e1ce63456733,pallets/flask,,d:\499\docs\web-security.rst,"What common web security risks (XSS/CSRF/Clickjacking/etc.) are mentioned in the Flask docs, and what mitigations are recommended for each?"
