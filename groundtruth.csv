@@ -1,6 +1,6 @@
-id,answer_url,answer_author,answer_createdAt,answer_chosen_at,answer_text,code_locations
-pallets/flask:5894,https://github.com/pallets/flask/discussions/5894#discussioncomment-15575415,davidism,2026-01-22T23:16:03Z,2026-01-23T20:54:29Z,There is nothing in Flask that would cause a redirect to prevent the download of a file being served. There is no way for the server to stop the browser from downloading a file it sends. That sounds like your browser or your frontend.,helpers.py:394-574
-pallets/flask:5740,https://github.com/pallets/flask/discussions/5740#discussioncomment-13214498,davidism,2025-05-21T03:10:19Z,2026-01-22T15:08:50Z,"You're looking for the stream_with_context function/decorator, documented here: https://flask.palletsprojects.com/page/patterns/streaming/#streaming-with-context",helpers.py:51-143;ctx.py:238-389;globals.py:17-52
+id,answer_url,answer_author,answer_createdAt,answer_chosen_at,answer_text,code_locations,answer_source,doc_locations
+pallets/flask:5894,https://github.com/pallets/flask/discussions/5894#discussioncomment-15575415,davidism,2026-01-22T23:16:03Z,2026-01-23T20:54:29Z,There is nothing in Flask that would cause a redirect to prevent the download of a file being served. There is no way for the server to stop the browser from downloading a file it sends. That sounds like your browser or your frontend.,helpers.py:394-574,,
+pallets/flask:5740,https://github.com/pallets/flask/discussions/5740#discussioncomment-13214498,davidism,2025-05-21T03:10:19Z,2026-01-22T15:08:50Z,"You're looking for the stream_with_context function/decorator, documented here: https://flask.palletsprojects.com/page/patterns/streaming/#streaming-with-context",helpers.py:51-143;ctx.py:238-389;globals.py:17-52,mixed,docs/patterns/streaming.rst:49-86
 pallets/flask:5773,https://github.com/pallets/flask/discussions/5773#discussioncomment-13753268,Istituto-freudinttheprodev,2025-07-14T14:52:48Z,2025-07-14T14:54:18Z,"Great question!
 The issue is that your route is only set to accept GET requests by default, since you didn’t specify the allowed methods.
 To fix the 405 error, you need to explicitly allow POST in the route definition using the methods parameter:
@@ -11,16 +11,16 @@ def submit():
         return f""Hello, {name}!""
     return ""Invalid method""
 This tells Flask to accept both GET and POST requests on that route.
-Let me know if it works! ✅",sansio/scaffold.py:284-365
+Let me know if it works! ✅",sansio/scaffold.py:284-365,,
 pallets/flask:5015,https://github.com/pallets/flask/discussions/5015#discussioncomment-5217820,davidism,2023-03-06T16:15:05Z,2023-03-06T17:01:27Z,"Please include a minimal reproducible example, and include the traceback with the warning. The code you've shown does not demonstrate the error.
-In general, you fix this in exactly the way that the message describes. Do not call any methods that set up the blueprint, such as registering routes, error handlers, before request functions, etc. after calling register_blueprint on it.",sansio/blueprints.py:213-221;sansio/scaffold.py:42-49
-pallets/flask:5684,https://github.com/pallets/flask/discussions/5684#discussioncomment-12355962,davidism,2025-02-28T19:32:26Z,2025-02-28T19:32:29Z,https://palletsprojects.com/versions,cli.py:268-277;__init__.py:47-60
+In general, you fix this in exactly the way that the message describes. Do not call any methods that set up the blueprint, such as registering routes, error handlers, before request functions, etc. after calling register_blueprint on it.",sansio/blueprints.py:213-221;sansio/scaffold.py:42-49,,
+pallets/flask:5684,https://github.com/pallets/flask/discussions/5684#discussioncomment-12355962,davidism,2025-02-28T19:32:26Z,2025-02-28T19:32:29Z,https://palletsprojects.com/versions,cli.py:268-277;__init__.py:47-60,,
 pallets/flask:5656,https://github.com/pallets/flask/discussions/5656#discussioncomment-11546232,davidism,2024-12-12T15:52:20Z,2024-12-15T17:58:25Z,"You're asking why code is running twice when using the debugger. Running the debugger runs the reloader. The reloader reloads at the very start to set things up. Your code executes, then is reloaded and executes again. You need to guard it with the following, similar to the if __name__ == ""__main__"" pattern.
 from werkzeug.serving import is_running_from_reloader
 
 if not is_running_from_reloader():
-    # setup code that should only run once",app.py:546-667;cli.py:900-1001
-pallets/flask:5612,https://github.com/pallets/flask/discussions/5612#discussioncomment-10952609,IArnaut2,2024-10-15T21:18:56Z,2025-01-31T16:23:45Z,"I've installed better jinja, but thanks anyway.",
+    # setup code that should only run once",app.py:546-667;cli.py:900-1001,,
+pallets/flask:5612,https://github.com/pallets/flask/discussions/5612#discussioncomment-10952609,IArnaut2,2024-10-15T21:18:56Z,2025-01-31T16:23:45Z,"I've installed better jinja, but thanks anyway.",,none,
 pallets/flask:4163,https://github.com/pallets/flask/discussions/4163#discussioncomment-893942,miguelgrinberg,2021-06-20T10:42:23Z,2021-06-20T22:22:53Z,"Hi Kyle!
 Interesting problem. I think you should be able to put the aiohttp session in flask.g. I'm writing this from memory, so you'll need to test it, but I think this should work.
 First, in a before_request handler you create the session:
@@ -37,34 +37,34 @@ weather_report = await fetch_weather(g.session, lat, lon)
 Finally, an teardown_request handler does the cleanup:
 @app.teardown_request
 async def teardown(exc):
-    await g.session.close()",app.py:1326-1358;ctx.py:287-410;app.py:966-1001
+    await g.session.close()",app.py:1326-1358;ctx.py:287-410;app.py:966-1001,,
 pallets/flask:5534,https://github.com/pallets/flask/discussions/5534#discussioncomment-10170919,miguelgrinberg,2024-07-28T09:41:56Z,2024-07-29T05:33:36Z,"Gunicorn monkey patches by default when using the gevent worker, so I think SQLAlchemy should work fine.
-My bet is that mysqlconnector, which is a C library, is incompatible with gevent. I would suggest you switch to pymysql for your database driver, that is more likely to work well with gevent's monkey patching because it is a pure Python library.",ctx.py:155-193;helpers.py:51-143
+My bet is that mysqlconnector, which is a C library, is incompatible with gevent. I would suggest you switch to pymysql for your database driver, that is more likely to work well with gevent's monkey patching because it is a pure Python library.",ctx.py:155-193;helpers.py:51-143,,
 pallets/flask:5507,https://github.com/pallets/flask/discussions/5507#discussioncomment-10011946,davidism,2024-07-10T15:55:26Z,2024-07-12T07:26:04Z,"This makes it sound like g is suitable as I'm trying to store information about the current request.
 
-g is the appropriate place to store per-request data. For extensions, we recommend using a prefix like _extension_name_ as a namespace to avoid any potential name conflicts. See https://flask.palletsprojects.com/en/3.0.x/extensiondev/ and specifically https://flask.palletsprojects.com/en/3.0.x/extensiondev/#data-during-a-request for extension dev docs about this.",ctx.py:238-285;globals.py:17-34;app.py:1386-1406
-pallets/flask:5520,https://github.com/pallets/flask/discussions/5520#discussioncomment-9980268,NikhilKalloli,2024-07-07T16:45:16Z,2024-07-07T16:47:53Z,"Consider using Streamlit instead of Flask. It offers better memory allocation for ML projects like your face recognition app. This can help address your deployment memory issues. For implementation details, check this",
+g is the appropriate place to store per-request data. For extensions, we recommend using a prefix like _extension_name_ as a namespace to avoid any potential name conflicts. See https://flask.palletsprojects.com/en/3.0.x/extensiondev/ and specifically https://flask.palletsprojects.com/en/3.0.x/extensiondev/#data-during-a-request for extension dev docs about this.",ctx.py:238-285;globals.py:17-34;app.py:1386-1406,mixed,docs/extensiondev.rst:161-188
+pallets/flask:5520,https://github.com/pallets/flask/discussions/5520#discussioncomment-9980268,NikhilKalloli,2024-07-07T16:45:16Z,2024-07-07T16:47:53Z,"Consider using Streamlit instead of Flask. It offers better memory allocation for ML projects like your face recognition app. This can help address your deployment memory issues. For implementation details, check this",,none,
 pallets/flask:5518,https://github.com/pallets/flask/discussions/5518#discussioncomment-9974007,CheeseCake87,2024-07-06T10:03:05Z,2024-07-09T08:57:25Z,"I just want to know is there any flask command that create a basic flask project that displays hello world so I can just create a basic app in one line without starting from the scratch.
 
-I wrote a Flask extension that pretty much does this. Flask-Imp CLI - The code for generating the files and folders is here: CLI Code , feel free to adjust and use the code if you find it useful.",
-pallets/flask:4790,https://github.com/pallets/flask/discussions/4790#discussioncomment-3493751,davidism,2022-08-28T16:06:25Z,2022-09-26T19:05:11Z,You somehow managed to install the latest version of Flask without also updating Werkzeug. Make sure you're running the latest supported versions of each library.,globals.py:17-52
-pallets/flask:5132,https://github.com/pallets/flask/discussions/5132#discussioncomment-6026943,pipozzz,2023-05-29T07:04:55Z,2023-05-29T07:08:36Z,"I found my problem , It's combination of gunicorn + gevent + latest flask this is not working, I switched to uwsgi + gevent + latest flask and now it works",
-pallets/flask:5454,https://github.com/pallets/flask/discussions/5454#discussioncomment-8986460,davidism,2024-04-02T16:25:48Z,2024-04-02T16:39:43Z,request.url_rul contains the matched Rule object https://werkzeug.palletsprojects.com/en/3.0.x/routing/#werkzeug.routing.Rule,helpers.py:195-246;app.py:1003-1127
+I wrote a Flask extension that pretty much does this. Flask-Imp CLI - The code for generating the files and folders is here: CLI Code , feel free to adjust and use the code if you find it useful.",,none,
+pallets/flask:4790,https://github.com/pallets/flask/discussions/4790#discussioncomment-3493751,davidism,2022-08-28T16:06:25Z,2022-09-26T19:05:11Z,You somehow managed to install the latest version of Flask without also updating Werkzeug. Make sure you're running the latest supported versions of each library.,globals.py:17-52,,
+pallets/flask:5132,https://github.com/pallets/flask/discussions/5132#discussioncomment-6026943,pipozzz,2023-05-29T07:04:55Z,2023-05-29T07:08:36Z,"I found my problem , It's combination of gunicorn + gevent + latest flask this is not working, I switched to uwsgi + gevent + latest flask and now it works",,none,
+pallets/flask:5454,https://github.com/pallets/flask/discussions/5454#discussioncomment-8986460,davidism,2024-04-02T16:25:48Z,2024-04-02T16:39:43Z,request.url_rul contains the matched Rule object https://werkzeug.palletsprojects.com/en/3.0.x/routing/#werkzeug.routing.Rule,helpers.py:195-246;app.py:1003-1127,,
 pallets/flask:5441,https://github.com/pallets/flask/discussions/5441#discussioncomment-8819934,ThiefMaster,2024-03-17T17:49:27Z,2024-03-17T17:59:11Z,"Flask does not contain an ORM. So this is (probably) an SQLAlchemy (not Flask-SQLAlchemy!) question.
-But AFAIK there is no ordering at all by default (whatever order the DB gives you), and when you use .order_by() it will create a db-level ORDER BY.",
-pallets/flask:5439,https://github.com/pallets/flask/discussions/5439#discussioncomment-8787919,davidism,2024-03-14T15:30:49Z,2024-03-14T16:41:17Z,"This is a common Python problem, unrelated to Flask. If you're not sure if a key ('name') is in a dict (session), you should use 'name' in session to check, or use session.get('name') which will return None rather than a key error if it's missing.",app.py:779-810;debughelpers.py:23-105
+But AFAIK there is no ordering at all by default (whatever order the DB gives you), and when you use .order_by() it will create a db-level ORDER BY.",,none,
+pallets/flask:5439,https://github.com/pallets/flask/discussions/5439#discussioncomment-8787919,davidism,2024-03-14T15:30:49Z,2024-03-14T16:41:17Z,"This is a common Python problem, unrelated to Flask. If you're not sure if a key ('name') is in a dict (session), you should use 'name' in session to check, or use session.get('name') which will return None rather than a key error if it's missing.",app.py:779-810;debughelpers.py:23-105,,
 pallets/flask:5429,https://github.com/pallets/flask/discussions/5429#discussioncomment-8674432,tachyondecay,2024-03-05T03:47:45Z,2024-03-05T20:23:39Z,"The simplest answer is: use an absolute path.
-Relative paths are relative to the app config object's root path, which by default will be app.root_path, which can be a couple of different things depending on how your package is configured. If you’re using a src layout, you might want to install your package in editable mode.",config.py:187-216;config.py:102-125
-pallets/flask:5394,https://github.com/pallets/flask/discussions/5394#discussioncomment-8258402,davidism,2024-01-26T15:17:42Z,2024-01-29T10:59:23Z,"Streaming responses can't handle errors late. In WSGI (and I'm pretty sure ASGI too), once a response has started, the headers and status code have already been sent to the client, and the body has already been started. It's impossible to take that back and send something else instead.",helpers.py:407-574;app.py:779-810
+Relative paths are relative to the app config object's root path, which by default will be app.root_path, which can be a couple of different things depending on how your package is configured. If you’re using a src layout, you might want to install your package in editable mode.",config.py:187-216;config.py:102-125,,
+pallets/flask:5394,https://github.com/pallets/flask/discussions/5394#discussioncomment-8258402,davidism,2024-01-26T15:17:42Z,2024-01-29T10:59:23Z,"Streaming responses can't handle errors late. In WSGI (and I'm pretty sure ASGI too), once a response has started, the headers and status code have already been sent to the client, and the body has already been started. It's impossible to take that back and send something else instead.",helpers.py:407-574;app.py:779-810,,
 pallets/flask:5390,https://github.com/pallets/flask/discussions/5390#discussioncomment-8227324,mrneont,2024-01-24T02:04:01Z,2024-01-24T03:43:15Z,"OK, that works. I'm just trying to give credit where credit is due.  Many R modules, for example, have more standard looking citations.  I was wondering if there were something along that lines.  But this is fine, as well.
-FWIW, there isn't a single Flask version to point to in my case; users will have a wide range of version numbers on their computers depending on their package manager.",
-pallets/flask:5365,https://github.com/pallets/flask/discussions/5365#discussioncomment-7880271,ThiefMaster,2023-12-18T00:11:57Z,2023-12-18T00:16:56Z,Read the error again. It mentions auth/register.html - where's your auth subdirectory? :),templating.py:52-110;templating.py:138-150;debughelpers.py:124-179
-pallets/flask:5358,https://github.com/pallets/flask/discussions/5358#discussioncomment-7790129,davidism,2023-12-07T15:12:40Z,2023-12-13T14:37:51Z,"Regardless of the version number, only the latest release is supported, across all Pallets projects. We always encourage users to update as soon as they are able to.",
+FWIW, there isn't a single Flask version to point to in my case; users will have a wide range of version numbers on their computers depending on their package manager.",,none,
+pallets/flask:5365,https://github.com/pallets/flask/discussions/5365#discussioncomment-7880271,ThiefMaster,2023-12-18T00:11:57Z,2023-12-18T00:16:56Z,Read the error again. It mentions auth/register.html - where's your auth subdirectory? :),templating.py:52-110;templating.py:138-150;debughelpers.py:124-179,,
+pallets/flask:5358,https://github.com/pallets/flask/discussions/5358#discussioncomment-7790129,davidism,2023-12-07T15:12:40Z,2023-12-13T14:37:51Z,"Regardless of the version number, only the latest release is supported, across all Pallets projects. We always encourage users to update as soon as they are able to.",,none,
 pallets/flask:5339,https://github.com/pallets/flask/discussions/5339#discussioncomment-7621840,ThiefMaster,2023-11-20T17:05:44Z,2023-11-20T19:06:21Z,"== is comparison, not assignment.
-Beyond that, I'm not going to help you changing the header value since I strongly believe that you're doing the wrong thing. Store your decoded JWT elsewhere.",
-pallets/flask:5321,https://github.com/pallets/flask/discussions/5321#discussioncomment-7471986,ThiefMaster,2023-11-04T01:14:02Z,2023-11-04T02:54:29Z,Flask-Script is dead. It has been last updated in 2017 and the repo is archived since 2020. Use the built-in flask cli (based on click) instead.,
+Beyond that, I'm not going to help you changing the header value since I strongly believe that you're doing the wrong thing. Store your decoded JWT elsewhere.",,none,
+pallets/flask:5321,https://github.com/pallets/flask/discussions/5321#discussioncomment-7471986,ThiefMaster,2023-11-04T01:14:02Z,2023-11-04T02:54:29Z,Flask-Script is dead. It has been last updated in 2017 and the repo is archived since 2020. Use the built-in flask cli (based on click) instead.,,none,
 pallets/flask:5261,https://github.com/pallets/flask/discussions/5261#discussioncomment-7075252,ThiefMaster,2023-09-21T22:29:40Z,2023-10-15T04:01:08Z,"Why not simply change your lookup callback to get it from g instead of the request ctx stack?
-current_org = LocalProxy(lambda: g.get('current_org'))",globals.py:17-52;ctx.py:29-115
+current_org = LocalProxy(lambda: g.get('current_org'))",globals.py:17-52;ctx.py:29-115,,
 pallets/flask:5290,https://github.com/pallets/flask/discussions/5290#discussioncomment-7213310,ThiefMaster,2023-10-06T20:22:43Z,2023-10-06T21:05:26Z,"Copying @davidism's comment from various issues first of all:
 
 When writing an application, you must use a tool like pip-tools to pin your application's full dependency tree. This gives you reproducible deployments, allowing you to control when you get updates. Be sure to run your tests with deprecation warnings treated as errors so that you get notified of those types of changes early.
@@ -81,8 +81,8 @@ https://iscinumpy.dev/post/bound-version-constraints/
 
 You are completely right that libraries should not pin dependencies - but the end applications that do use those libraries should absolutely do it, and by pinning transitive dependencies, they ensure that they do not end up with something like ""flask 2 + werkzeug 3"".
 Of course any new application should not use outdated versions, so a new application should be installing the latest flask, which pulls in the latest werkzeug, and at that point they are compatible with each other - and then you pin those dependencies to have a working set.
-At a later point you can easily use something like pip-compile to update your deps and test if things still work as they should using those latest versions.",
-pallets/flask:4929,https://github.com/pallets/flask/discussions/4929#discussioncomment-5276387,davidism,2023-03-11T15:25:19Z,2023-03-11T15:25:21Z,Flask's official documentation on Celery was rewritten recently. It shows how to use the app factory with both Flask and Celery. https://flask.palletsprojects.com/en/2.2.x/patterns/celery/,
+At a later point you can easily use something like pip-compile to update your deps and test if things still work as they should using those latest versions.",,none,
+pallets/flask:4929,https://github.com/pallets/flask/discussions/4929#discussioncomment-5276387,davidism,2023-03-11T15:25:19Z,2023-03-11T15:25:21Z,Flask's official documentation on Celery was rewritten recently. It shows how to use the app factory with both Flask and Celery. https://flask.palletsprojects.com/en/2.2.x/patterns/celery/,,docs,docs/patterns/celery.rst:1-243
 pallets/flask:4901,https://github.com/pallets/flask/discussions/4901#discussioncomment-4388090,ViniciusMarchi,2022-12-13T10:10:23Z,2022-12-13T19:25:10Z,"Hello, I think I can help you with that. First, let's explain some points. In the example repository that you share you are using fetch and FormData to make request to FlaskAPI. Given this, we have the first point:
 
 Remove the headers option from fetch request.
@@ -155,34 +155,34 @@ def create_app() -> Flask:
         return ''            
     
     return app
-I hope it helps.",wrappers.py:197-211;debughelpers.py:23-105
+I hope it helps.",wrappers.py:197-211;debughelpers.py:23-105,,
 pallets/flask:5033,https://github.com/pallets/flask/discussions/5033#discussioncomment-5420884,RonnyPfannschmidt,2023-03-24T16:59:26Z,2023-03-24T17:20:31Z,"its not quite clear what you are asking for, there can only be one response, itsc currently either the json or the zip file
-without providing details on the intended conusmption its unclear how to do what you want",app.py:1129-1269;helpers.py:394-574
-pallets/flask:5208,https://github.com/pallets/flask/discussions/5208#discussioncomment-6478540,davidism,2023-07-18T13:31:10Z,2023-07-20T07:20:51Z,Yes it's supported by Werkzeug. It looks like the PR that removed it was trying to make the quickstart page less verbose and more focused on basic use cases.,sansio/app.py:390-405;ctx.py:391-394
+without providing details on the intended conusmption its unclear how to do what you want",app.py:1129-1269;helpers.py:394-574,,
+pallets/flask:5208,https://github.com/pallets/flask/discussions/5208#discussioncomment-6478540,davidism,2023-07-18T13:31:10Z,2023-07-20T07:20:51Z,Yes it's supported by Werkzeug. It looks like the PR that removed it was trying to make the quickstart page less verbose and more focused on basic use cases.,sansio/app.py:390-405;ctx.py:391-394,,
 pallets/flask:5179,https://github.com/pallets/flask/discussions/5179#discussioncomment-6308959,davidism,2023-06-28T21:04:59Z,2023-06-29T07:37:02Z,"open the database connection in the converter, and check if it is already opened in the before_request callback
 
 That's fine.
-It's essentially what happens with Flask-SQLAlchemy, although there it's more hidden. The connection isn't made until you actually access the database with something like db.session.execute(), then it's reused.",app.py:1271-1296;sansio/scaffold.py:459-484;ctx.py:367-395
+It's essentially what happens with Flask-SQLAlchemy, although there it's more hidden. The connection isn't made until you actually access the database with something like db.session.execute(), then it's reused.",app.py:1271-1296;sansio/scaffold.py:459-484;ctx.py:367-395,,
 pallets/flask:5151,https://github.com/pallets/flask/discussions/5151#discussioncomment-6209970,EliseRemise,2023-06-18T14:10:40Z,2023-06-18T14:14:03Z,"I ran into this problem following the flaskr tutorial. The problem lies in the other directories in the root folder created earlier in the tutorial (instances and tests).  This confuses  pip install as well as build automation.  You are offered the solutions 1-3 but those are not very clear on howto if you are new to creating packages and wheels in python.  Easiest is number 3 by adding the following lines to your pyproject.toml file:
 [tool.setuptools]
 packages = [""flaskr""]
 
-Now pip install and build have the package explicitly defined an do there thing without overthinking the presence of other directories. Maybe someone can add this to the tutorial so newcomers don't get confused ?",
+Now pip install and build have the package explicitly defined an do there thing without overthinking the presence of other directories. Maybe someone can add this to the tutorial so newcomers don't get confused ?",,none,
 pallets/flask:5166,https://github.com/pallets/flask/discussions/5166#discussioncomment-6188499,davidism,2023-06-15T16:44:42Z,2023-06-15T17:06:39Z,"See the documentation for record_once and record: https://flask.palletsprojects.com/en/2.3.x/api/#flask.Blueprint.record. The decorated function takes a state argument.
 @blueprint.record_once
 def my_test_function(state):
-    state.app.logger.info(""testing"")",sansio/blueprints.py:223-245;sansio/blueprints.py:334-336
+    state.app.logger.info(""testing"")",sansio/blueprints.py:223-245;sansio/blueprints.py:334-336,mixed,docs/api.rst:19-25
 pallets/flask:5156,https://github.com/pallets/flask/discussions/5156#discussioncomment-6113557,davidism,2023-06-07T15:55:02Z,2023-06-07T16:14:56Z,"You still need to run commands with the flask command, that's why you register them with app.cli.add_command.
 $ flask main test
 
 If you really want to use only your group and not the flask command, then you need to create the ScriptInfo object like FlaskGroup would have done for you.
 if __name__ == ""__main__"":
     info = ScriptInfo(create_app=create_app)
-    cli(obj=info)",cli.py:333-372;cli.py:453-465;cli.py:665-696
+    cli(obj=info)",cli.py:333-372;cli.py:453-465;cli.py:665-696,,
 pallets/flask:5145,https://github.com/pallets/flask/discussions/5145#discussioncomment-6019998,ThiefMaster,2023-05-27T17:59:01Z,2023-06-05T13:18:10Z,"TBH, my first impression there is ""over-engineered""... ;)
 My approach would be to keep core stuff in your core app, and then create plugins for your application (e.g. using setup.cfg entry points, and there's also flask-pluginengine (disclaimer: I'm the author)). Those plugins then import stuff directly from the core app, e.g. from yourapp.flaskstuff import db to get the SQLAlchemy object; same for the rest.
-When a plugin depends on another one  it declares that dependency so the other one gets loaded first; and so far I never had to deal w/ circular dependencies but I'd simply do the imports locally within a function if it otherwise creates problems - but again, try to avoid having circular dependencies altogether.",sansio/app.py:379-388
-pallets/flask:5143,https://github.com/pallets/flask/discussions/5143#discussioncomment-5993807,davidism,2023-05-24T19:40:07Z,2023-05-24T19:40:10Z,Yes,
+When a plugin depends on another one  it declares that dependency so the other one gets loaded first; and so far I never had to deal w/ circular dependencies but I'd simply do the imports locally within a function if it otherwise creates problems - but again, try to avoid having circular dependencies altogether.",sansio/app.py:379-388,,
+pallets/flask:5143,https://github.com/pallets/flask/discussions/5143#discussioncomment-5993807,davidism,2023-05-24T19:40:07Z,2023-05-24T19:40:10Z,Yes,,none,
 pallets/flask:5114,https://github.com/pallets/flask/discussions/5114#discussioncomment-5812161,abhint,2023-05-05T05:09:20Z,2023-05-25T16:07:55Z,"from flask import Flask, request
 
 app = Flask(__name__)
@@ -191,10 +191,10 @@ app = Flask(__name__)
 def before_request():
     endpoints = ['/endpoint1', '/endpoint2']
     if request.endpoint in endpoints:
-        print('Code executed for endpoint:', request.endpoint)",sansio/scaffold.py:459-484;app.py:1271-1296
-pallets/flask:5137,https://github.com/pallets/flask/discussions/5137#discussioncomment-5981601,ThiefMaster,2023-05-23T18:39:43Z,2023-05-23T18:49:19Z,"Read the quickstart guide, it literally uses a database. There's also Flask-SQLAlchemy.",
+        print('Code executed for endpoint:', request.endpoint)",sansio/scaffold.py:459-484;app.py:1271-1296,,
+pallets/flask:5137,https://github.com/pallets/flask/discussions/5137#discussioncomment-5981601,ThiefMaster,2023-05-23T18:39:43Z,2023-05-23T18:49:19Z,"Read the quickstart guide, it literally uses a database. There's also Flask-SQLAlchemy.",,none,
 pallets/flask:5130,https://github.com/pallets/flask/discussions/5130#discussioncomment-5924577,RonnyPfannschmidt,2023-05-17T07:54:20Z,2023-05-17T13:59:06Z,"As per the spec, the 204 is to be used after the client reconnects
-The expectation is that the client keeps reconnecting, and the server can use a204 on the next connection",
+The expectation is that the client keeps reconnecting, and the server can use a204 on the next connection",,none,
 pallets/flask:4660,https://github.com/pallets/flask/discussions/4660#discussioncomment-3051975,davidism,2022-06-29T22:45:03Z,2022-06-30T20:53:52Z,"Flask itself has some detection for when FLASK_APP isn't set that will probably serve you well enough.
 
 Look for a file called wsgi.py or app.py in the current directory.
@@ -203,16 +203,16 @@ Look for any variable that is an instance of Flask and return that.
 Look for a function called create_app or make_app. Call it without arguments, if it returns a Flask object return it.
 
 I'd suggest extending this to looking in __init__.py and app.py files within the packages in the current project, something VS Code should be able to figure out which Flask itself can't. And since you're not actually executing code, look for var = Flask( like you suggested, and assume factory functions return correctly.
-If you can't detect something automatically using the rules above, or even if you can, I'd suggest looking at PyCharm Professional's Flask server run configuration. It can detect what to run in many cases (probably the rules above), and then allows customizing them further to support the full range of what FLASK_APP and flask run can do.",cli.py:41-91;cli.py:333-372
-pallets/flask:5128,https://github.com/pallets/flask/discussions/5128#discussioncomment-5909611,davidism,2023-05-15T20:55:15Z,2023-05-15T20:55:17Z,"Flask intentionally requires no structure beyond ""single Python module"", and no specific libraries for other services. Check out cookiecutter, it's already a great framework for creating and using project templates. If you want an opinionated starting point, there are already multiple templates for Flask projects.",
+If you can't detect something automatically using the rules above, or even if you can, I'd suggest looking at PyCharm Professional's Flask server run configuration. It can detect what to run in many cases (probably the rules above), and then allows customizing them further to support the full range of what FLASK_APP and flask run can do.",cli.py:41-91;cli.py:333-372,,
+pallets/flask:5128,https://github.com/pallets/flask/discussions/5128#discussioncomment-5909611,davidism,2023-05-15T20:55:15Z,2023-05-15T20:55:17Z,"Flask intentionally requires no structure beyond ""single Python module"", and no specific libraries for other services. Check out cookiecutter, it's already a great framework for creating and using project templates. If you want an opinionated starting point, there are already multiple templates for Flask projects.",,none,
 pallets/flask:5115,https://github.com/pallets/flask/discussions/5115#discussioncomment-5806876,ThiefMaster,2023-05-04T15:13:01Z,2023-05-04T22:27:23Z,"json_encoder and json_decoder attributes on app and blueprint, and the corresponding json.JSONEncoder and JSONDecoder classes, are removed.
 
-Probably related to this? You need to fix your code which currently tries to import this in webapp/oauth10a.py which seems to be your own code.",sansio/app.py:230-240;json/provider.py:124-216
-pallets/flask:5092,https://github.com/pallets/flask/discussions/5092#discussioncomment-5732141,ThiefMaster,2023-04-26T14:04:49Z,2023-05-01T08:09:44Z,"This has nothing to do with Flask/Werkzeug. Also, the request to load the page has already finished by the time JS/CSS are getting loaded.",
-pallets/flask:5095,https://github.com/pallets/flask/discussions/5095#discussioncomment-5737199,davidism,2023-04-27T00:39:03Z,2023-04-27T01:37:28Z,"Described in the API docs, they have moved to attributes on the default provider class: https://flask.palletsprojects.com/en/2.3.x/api/?highlight=sort_keys#flask.json.provider.DefaultJSONProvider. Also, using these raised deprecation warnings in 2.2.x, be sure to run your tests with deprecation warnings treated as errors so that you get notified of those types of changes early.",json/provider.py:124-216;sansio/app.py:230-240
-pallets/flask:5065,https://github.com/pallets/flask/discussions/5065#discussioncomment-5623478,ThiefMaster,2023-04-15T13:06:04Z,2023-04-15T14:18:36Z,This is completely out of the scope of Flask. Use requests or a similar library to make outgoing requests. There is pretty much nothing in Flask (or werkzeug) that would make it logical to include an http client there...,
-pallets/flask:5064,https://github.com/pallets/flask/discussions/5064#discussioncomment-5618889,davidism,2023-04-14T17:47:44Z,2023-04-14T17:47:50Z,"You need to navigate to one of the paths you defined, you didn't set anything for the root.",ctx.py:357-365;app.py:879-903;app.py:478-505
-pallets/flask:5042,https://github.com/pallets/flask/discussions/5042#discussioncomment-5523325,BobSquarePants,2023-04-04T16:38:38Z,2023-04-04T16:46:23Z,"That Internet browser had in the options ""Clear cookies etc.. when closing.."" so the browser was setting all cookies and any other storage as ""session expire""",sessions.py:237-245;sessions.py:351-399
+Probably related to this? You need to fix your code which currently tries to import this in webapp/oauth10a.py which seems to be your own code.",sansio/app.py:230-240;json/provider.py:124-216,,
+pallets/flask:5092,https://github.com/pallets/flask/discussions/5092#discussioncomment-5732141,ThiefMaster,2023-04-26T14:04:49Z,2023-05-01T08:09:44Z,"This has nothing to do with Flask/Werkzeug. Also, the request to load the page has already finished by the time JS/CSS are getting loaded.",,none,
+pallets/flask:5095,https://github.com/pallets/flask/discussions/5095#discussioncomment-5737199,davidism,2023-04-27T00:39:03Z,2023-04-27T01:37:28Z,"Described in the API docs, they have moved to attributes on the default provider class: https://flask.palletsprojects.com/en/2.3.x/api/?highlight=sort_keys#flask.json.provider.DefaultJSONProvider. Also, using these raised deprecation warnings in 2.2.x, be sure to run your tests with deprecation warnings treated as errors so that you get notified of those types of changes early.",json/provider.py:124-216;sansio/app.py:230-240,mixed,docs/config.rst:437-443;docs/api.rst:252-258
+pallets/flask:5065,https://github.com/pallets/flask/discussions/5065#discussioncomment-5623478,ThiefMaster,2023-04-15T13:06:04Z,2023-04-15T14:18:36Z,This is completely out of the scope of Flask. Use requests or a similar library to make outgoing requests. There is pretty much nothing in Flask (or werkzeug) that would make it logical to include an http client there...,,none,
+pallets/flask:5064,https://github.com/pallets/flask/discussions/5064#discussioncomment-5618889,davidism,2023-04-14T17:47:44Z,2023-04-14T17:47:50Z,"You need to navigate to one of the paths you defined, you didn't set anything for the root.",ctx.py:357-365;app.py:879-903;app.py:478-505,,
+pallets/flask:5042,https://github.com/pallets/flask/discussions/5042#discussioncomment-5523325,BobSquarePants,2023-04-04T16:38:38Z,2023-04-04T16:46:23Z,"That Internet browser had in the options ""Clear cookies etc.. when closing.."" so the browser was setting all cookies and any other storage as ""session expire""",sessions.py:237-245;sessions.py:351-399,,
 pallets/flask:5030,https://github.com/pallets/flask/discussions/5030#discussioncomment-5373283,misilot,2023-03-20T18:50:31Z,2023-03-20T18:50:33Z,"I got it working the following
         @app.route('/favicon.ico')
         def favicon():
@@ -254,35 +254,35 @@ class KSULBootstrap4(Bootstrap4):
 
         super().init_app(app=app)
 
-        app.register_blueprint(blueprint)",helpers.py:195-246;app.py:1003-1127
+        app.register_blueprint(blueprint)",helpers.py:195-246;app.py:1003-1127,,
 pallets/flask:5027,https://github.com/pallets/flask/discussions/5027#discussioncomment-5291324,RonnyPfannschmidt,2023-03-13T13:06:02Z,2023-03-13T13:28:48Z,"by applying https://werkzeug.palletsprojects.com/en/2.2.x/middleware/proxy_fix/
-this is intentionally not the default to protect apps from being passed those headers with malicious intent",
-pallets/flask:5019,https://github.com/pallets/flask/discussions/5019#discussioncomment-5276367,davidism,2023-03-11T15:21:01Z,2023-03-11T15:21:17Z,"Looks like an issue with Flask-Restful, so it should be reported there. It already was reported flask-restful/flask-restful#957, looks like you reported a duplicate. We're not the maintainers of Flask-Restful, so asking here is off topic.",
-pallets/flask:5016,https://github.com/pallets/flask/discussions/5016#discussioncomment-5218309,davidism,2023-03-06T17:00:28Z,2023-03-06T17:00:29Z,We don't keep a strict release cadence. Releases happen when a maintainer has enough time to decide that the release is ready and to make it happen.,
-pallets/flask:5012,https://github.com/pallets/flask/discussions/5012#discussioncomment-5202766,davidism,2023-03-04T16:02:12Z,2023-03-04T16:02:17Z,"Remember to search first. I literally searched for ""flask twice"" and got this as the first result: https://stackoverflow.com/questions/25504149/why-does-running-the-flask-dev-server-run-itself-twice",app.py:546-667;cli.py:943-1001
+this is intentionally not the default to protect apps from being passed those headers with malicious intent",,docs,docs/deploying/proxy_fix.rst:1-34
+pallets/flask:5019,https://github.com/pallets/flask/discussions/5019#discussioncomment-5276367,davidism,2023-03-11T15:21:01Z,2023-03-11T15:21:17Z,"Looks like an issue with Flask-Restful, so it should be reported there. It already was reported flask-restful/flask-restful#957, looks like you reported a duplicate. We're not the maintainers of Flask-Restful, so asking here is off topic.",,none,
+pallets/flask:5016,https://github.com/pallets/flask/discussions/5016#discussioncomment-5218309,davidism,2023-03-06T17:00:28Z,2023-03-06T17:00:29Z,We don't keep a strict release cadence. Releases happen when a maintainer has enough time to decide that the release is ready and to make it happen.,,none,
+pallets/flask:5012,https://github.com/pallets/flask/discussions/5012#discussioncomment-5202766,davidism,2023-03-04T16:02:12Z,2023-03-04T16:02:17Z,"Remember to search first. I literally searched for ""flask twice"" and got this as the first result: https://stackoverflow.com/questions/25504149/why-does-running-the-flask-dev-server-run-itself-twice",app.py:546-667;cli.py:943-1001,,
 pallets/flask:4961,https://github.com/pallets/flask/discussions/4961#discussioncomment-4867874,tachyondecay,2023-02-04T05:40:47Z,2023-03-11T15:22:37Z,"You can join us on Discord, or if that isn’t your flavour, #pallets on Libera.Chat is bridged to the Discord's questions channel.
-I think there’s a Flask subreddit if forum-like conversations are more your thing.",
+I think there’s a Flask subreddit if forum-like conversations are more your thing.",,none,
 pallets/flask:4978,https://github.com/pallets/flask/discussions/4978#discussioncomment-4975633,davidism,2023-02-14T21:05:30Z,2023-03-11T15:26:39Z,"You can set the SERVER_NAME to localhost:8000 during development.
-https://flask.palletsprojects.com/en/2.2.x/appcontext/#manually-push-a-context shows how to push an app context during the factory function.",app.py:1003-1095;app.py:1386-1405
-pallets/flask:4793,https://github.com/pallets/flask/discussions/4793#discussioncomment-3509849,davidism,2022-08-30T15:00:50Z,2022-08-30T15:52:47Z,Upgrade to Flask 2.2.,globals.py:17-34;app.py:1386-1405
-pallets/flask:4896,https://github.com/pallets/flask/discussions/4896#discussioncomment-4307259,ThiefMaster,2022-12-04T17:59:36Z,2022-12-04T19:14:31Z,Use a Python version that's not ancient (3.6 is even EOL).,
-pallets/flask:4886,https://github.com/pallets/flask/discussions/4886#discussioncomment-4269939,davidism,2022-11-30T02:53:16Z,2022-11-30T06:54:14Z,Please don't cross post questions.,
+https://flask.palletsprojects.com/en/2.2.x/appcontext/#manually-push-a-context shows how to push an app context during the factory function.",app.py:1003-1095;app.py:1386-1405,mixed,docs/config.rst:279-289;docs/appcontext.rst:42-69
+pallets/flask:4793,https://github.com/pallets/flask/discussions/4793#discussioncomment-3509849,davidism,2022-08-30T15:00:50Z,2022-08-30T15:52:47Z,Upgrade to Flask 2.2.,globals.py:17-34;app.py:1386-1405,,
+pallets/flask:4896,https://github.com/pallets/flask/discussions/4896#discussioncomment-4307259,ThiefMaster,2022-12-04T17:59:36Z,2022-12-04T19:14:31Z,Use a Python version that's not ancient (3.6 is even EOL).,,none,
+pallets/flask:4886,https://github.com/pallets/flask/discussions/4886#discussioncomment-4269939,davidism,2022-11-30T02:53:16Z,2022-11-30T06:54:14Z,Please don't cross post questions.,,none,
 pallets/flask:4878,https://github.com/pallets/flask/discussions/4878#discussioncomment-4240027,tachyondecay,2022-11-25T21:48:43Z,2022-11-28T05:59:47Z,"You can call app.config.update() at any time to update your app's configuration, but you probably shouldn’t.
 Remember that under most circumstances, you’ll be running multiple workers/threads and therefore multiple instances of your app. Therefore, updating the config in this way would only affect a single instance.
 If you have changed your configuration, you should restart all running instances of your app.
-If you have data that you expect to change while the app is running, you should store it in a database, redis, etc.—somewhere centralized that your app can query whenever it needs that data.",config.py:50-101
+If you have data that you expect to change while the app is running, you should store it in a database, redis, etc.—somewhere centralized that your app can query whenever it needs that data.",config.py:50-101,,
 pallets/flask:4838,https://github.com/pallets/flask/discussions/4838#discussioncomment-3803772,,2022-10-05T10:33:46Z,2022-10-05T10:34:28Z,"For requests that take a long time, you might want to consider starting a background job for them.
-The server component that comes with Flask is really only meant for when you are developing your application. Even though it is configured to handle concurrent requests by default.",app.py:546-667;cli.py:943-1001
-pallets/flask:4822,https://github.com/pallets/flask/discussions/4822#discussioncomment-3678417,NSH531,2022-09-19T07:58:32Z,2022-09-19T08:08:30Z,I'm reinstalling  flask and markupsafe,
+The server component that comes with Flask is really only meant for when you are developing your application. Even though it is configured to handle concurrent requests by default.",app.py:546-667;cli.py:943-1001,,
+pallets/flask:4822,https://github.com/pallets/flask/discussions/4822#discussioncomment-3678417,NSH531,2022-09-19T07:58:32Z,2022-09-19T08:08:30Z,I'm reinstalling  flask and markupsafe,,none,
 pallets/flask:4820,https://github.com/pallets/flask/discussions/4820#discussioncomment-3667053,RonnyPfannschmidt,2022-09-17T06:10:18Z,2022-09-17T08:31:51Z,"It's not clear what you are asking for, flask is a normal wsgi Web framework, snake is a entirely custom Linux system
 If there is virtualenv and a terminal then it's likely possible to use flask
-Anything else is on you as its a relatively unknown linuy distribution that's certainly not in the default set of things to check",
-pallets/flask:4805,https://github.com/pallets/flask/discussions/4805#discussioncomment-3556777,ThiefMaster,2022-09-05T08:42:59Z,2022-09-05T08:46:32Z,"For problems with your own code, provide a minimal but complete snippet to reproduce. Just a template w/o surrounding code isn't complete...",app.py:1003-1127;sansio/blueprints.py:302-329;sansio/scaffold.py:224-270
+Anything else is on you as its a relatively unknown linuy distribution that's certainly not in the default set of things to check",,none,
+pallets/flask:4805,https://github.com/pallets/flask/discussions/4805#discussioncomment-3556777,ThiefMaster,2022-09-05T08:42:59Z,2022-09-05T08:46:32Z,"For problems with your own code, provide a minimal but complete snippet to reproduce. Just a template w/o surrounding code isn't complete...",app.py:1003-1127;sansio/blueprints.py:302-329;sansio/scaffold.py:224-270,,
 pallets/flask:4803,https://github.com/pallets/flask/discussions/4803#discussioncomment-3540930,tachyondecay,2022-09-03T02:41:03Z,2022-09-03T08:53:27Z,"Your code is missing an index() view function. The quickstart’s version is:
 @app.route('/')
 def index():
     return 'index'
-Without the above code, calling url_for('index') naturally results in a BuildError.",app.py:1003-1127;helpers.py:195-246;sansio/app.py:932-965
+Without the above code, calling url_for('index') naturally results in a BuildError.",app.py:1003-1127;helpers.py:195-246;sansio/app.py:932-965,,
 pallets/flask:4785,https://github.com/pallets/flask/discussions/4785#discussioncomment-3476171,davidism,2022-08-25T16:06:59Z,2022-08-25T16:40:56Z,"SQLAlchemy events are entirely part of SQLAlchemy. A Flask app context shouldn't be required to manage them. You should attach the events when creating the engine, not on every app context push.
 Push an app context to get access to Flask-SQLAlchemy's engine. The same engine (pool) is reused across contexts, even though it requires an active context to actually get it.
 with app.app_context():
@@ -290,15 +290,15 @@ with app.app_context():
 
     @sa.events.listen_for(engine, ""event_name"")
     def my_listener(...):
-        ...",
-pallets/flask:4727,https://github.com/pallets/flask/discussions/4727#discussioncomment-3307771,davidism,2022-08-02T12:46:58Z,2022-08-02T13:13:35Z,"before_first_request is deprecated and will be removed in Flask 2.3. As part of that, some internals were refactored for performance, including try_trigger_before_first_request_functions method. What code were you using that was calling this method? This method was not intended as a public API, and will be going away completely in the next feature release, so it's probably better to address whatever is using it.",
-pallets/flask:4717,https://github.com/pallets/flask/discussions/4717#discussioncomment-3297195,davidism,2022-08-01T13:36:45Z,2022-08-02T05:52:03Z,Whether you're accessing your app through Tor or any other network doesn't change that you should deploy it with production WSGI and HTTP servers.,
-pallets/flask:4700,https://github.com/pallets/flask/discussions/4700#discussioncomment-3171746,davidism,2022-07-18T13:22:48Z,2022-07-19T03:55:03Z,"You can't do that, it's not how routes are supposed to work. Instead, create routes (or a route with a variable part) ahead of time, and use a database, the session, redis, etc. to track information about what should be happening at any given time. For example, when accessing the first route, check that a flag hasn't been set, and when accessing the second check that it has.",sansio/scaffold.py:42-49;sansio/app.py:409-423;app.py:904-920
+        ...",,none,
+pallets/flask:4727,https://github.com/pallets/flask/discussions/4727#discussioncomment-3307771,davidism,2022-08-02T12:46:58Z,2022-08-02T13:13:35Z,"before_first_request is deprecated and will be removed in Flask 2.3. As part of that, some internals were refactored for performance, including try_trigger_before_first_request_functions method. What code were you using that was calling this method? This method was not intended as a public API, and will be going away completely in the next feature release, so it's probably better to address whatever is using it.",,none,
+pallets/flask:4717,https://github.com/pallets/flask/discussions/4717#discussioncomment-3297195,davidism,2022-08-01T13:36:45Z,2022-08-02T05:52:03Z,Whether you're accessing your app through Tor or any other network doesn't change that you should deploy it with production WSGI and HTTP servers.,,none,
+pallets/flask:4700,https://github.com/pallets/flask/discussions/4700#discussioncomment-3171746,davidism,2022-07-18T13:22:48Z,2022-07-19T03:55:03Z,"You can't do that, it's not how routes are supposed to work. Instead, create routes (or a route with a variable part) ahead of time, and use a database, the session, redis, etc. to track information about what should be happening at any given time. For example, when accessing the first route, check that a flag hasn't been set, and when accessing the second check that it has.",sansio/scaffold.py:42-49;sansio/app.py:409-423;app.py:904-920,,
 pallets/flask:4690,https://github.com/pallets/flask/discussions/4690#discussioncomment-3129046,ThiefMaster,2022-07-12T12:50:46Z,2022-07-13T07:38:40Z,"Look at the traceback. Your error comes from inside compreface when it seems to make a network request to something.
-PS: Your flask view function needs to return something or it'll fail - but that's unrelated to your error.",app.py:1129-1216
-pallets/flask:4565,https://github.com/pallets/flask/discussions/4565#discussioncomment-2673272,davidism,2022-05-02T12:33:43Z,2022-05-02T13:31:57Z,"No, they are currently the same URL.",
-pallets/flask:4554,https://github.com/pallets/flask/discussions/4554#discussioncomment-2654708,davidism,2022-04-28T13:19:58Z,2022-04-28T13:52:25Z,By writing flask[async].,
-pallets/flask:4478,https://github.com/pallets/flask/discussions/4478#discussioncomment-2561824,mpounsett,2022-04-13T18:23:19Z,2022-04-13T18:23:27Z,"I'm embarassed that I didn't notice this earlier, but the option and argument decorators above should be @click.option and @click.argument, not @bar....  Leaving this here in case anyone else makes the same mistake, so this can be found.",
+PS: Your flask view function needs to return something or it'll fail - but that's unrelated to your error.",app.py:1129-1216,,
+pallets/flask:4565,https://github.com/pallets/flask/discussions/4565#discussioncomment-2673272,davidism,2022-05-02T12:33:43Z,2022-05-02T13:31:57Z,"No, they are currently the same URL.",,none,
+pallets/flask:4554,https://github.com/pallets/flask/discussions/4554#discussioncomment-2654708,davidism,2022-04-28T13:19:58Z,2022-04-28T13:52:25Z,By writing flask[async].,,none,
+pallets/flask:4478,https://github.com/pallets/flask/discussions/4478#discussioncomment-2561824,mpounsett,2022-04-13T18:23:19Z,2022-04-13T18:23:27Z,"I'm embarassed that I didn't notice this earlier, but the option and argument decorators above should be @click.option and @click.argument, not @bar....  Leaving this here in case anyone else makes the same mistake, so this can be found.",,none,
 pallets/flask:4508,https://github.com/pallets/flask/discussions/4508#discussioncomment-2469964,davidism,2022-03-30T13:10:10Z,2022-03-31T01:38:06Z,"app/views/error_handler.py:18: in custom_client_error_handler
     current_app.logger.warning(exception, extra=dict(extra_data=to_extra_data()))
 app/views/error_handler.py:46: in to_extra_data
@@ -307,18 +307,18 @@ app/views/error_handler.py:46: in to_extra_data
     return self.get_json()
 Looks like you have a custom_client_error_handler method that calls to_extra_data for logging. That calls request.json unconditionally.
 In pallets/werkzeug#2355, accessing json now raises a 400 error instead of returning None if the request is not well formed. You can use silent=True to make it return None instead, or you can use request.is_json instead to check if the request has a JSON content type before trying to decode the data.
-So you could change line app/views/error_handler.py:46 in your code to json_body=request.get_json(silent=True) if to optionally collect JSON data.",wrappers.py:212-219;app.py:779-810;sansio/app.py:848-881
-pallets/flask:4493,https://github.com/pallets/flask/discussions/4493#discussioncomment-2432025,davidism,2022-03-24T17:31:16Z,2022-03-24T17:32:31Z,Look at what the test is testing: it expects that a view that raises an unhandled exception will produce a specific result. 1/0 is one easy way to cause an exception.,app.py:669-726;app.py:811-862;app.py:779-810
-pallets/flask:4475,https://github.com/pallets/flask/discussions/4475#discussioncomment-2309503,davidism,2022-03-07T15:37:15Z,2022-03-08T13:00:02Z,The issue tracker shows issues that are currently open. https://github.com/pallets/flask/issues The other Pallets projects used by Flask all have their own trackers.,
-pallets/flask:4441,https://github.com/pallets/flask/discussions/4441#discussioncomment-2145704,tachyondecay,2022-02-10T00:22:55Z,2022-02-10T01:22:07Z,The answer is to your question remains the same as in the discussion you referenced.,
-pallets/flask:4440,https://github.com/pallets/flask/discussions/4440#discussioncomment-2108102,tachyondecay,2022-02-04T02:18:15Z,2022-02-22T08:52:46Z,Waitress is a production-quality WSGI server and works on Windows.,
-pallets/flask:4354,https://github.com/pallets/flask/discussions/4354#discussioncomment-1678016,ThiefMaster,2021-11-21T18:09:34Z,2021-11-21T18:57:21Z,Use current_app.config...,globals.py:24-33;sansio/app.py:311-337;config.py:50-101
-pallets/flask:4345,https://github.com/pallets/flask/discussions/4345#discussioncomment-1666405,Yourun-proger,2021-11-18T18:15:52Z,2021-11-19T00:40:17Z,"@animehunter123 , hi! There was the following discussion about this, where it says that the documentation will no longer be updated. But you can do it manually using this",
-pallets/flask:4275,https://github.com/pallets/flask/discussions/4275#discussioncomment-1407097,miguelgrinberg,2021-09-30T06:35:03Z,2021-09-30T15:21:14Z,Imports inside the factory function are one of the techniques you can use to avoid circular import errors.,
-pallets/flask:4247,https://github.com/pallets/flask/discussions/4247#discussioncomment-1248677,greyli,2021-08-29T00:45:21Z,2021-08-29T16:25:52Z,The contributing guide contains everything you need to know to contribute to Flask.,
-pallets/flask:4244,https://github.com/pallets/flask/discussions/4244#discussioncomment-1239141,davidism,2021-08-26T12:45:26Z,2021-08-26T12:45:29Z,"When we have time to go through the release process, it will be released. Sorry, we can't give a more precise answer than that.",
+So you could change line app/views/error_handler.py:46 in your code to json_body=request.get_json(silent=True) if to optionally collect JSON data.",wrappers.py:212-219;app.py:779-810;sansio/app.py:848-881,,
+pallets/flask:4493,https://github.com/pallets/flask/discussions/4493#discussioncomment-2432025,davidism,2022-03-24T17:31:16Z,2022-03-24T17:32:31Z,Look at what the test is testing: it expects that a view that raises an unhandled exception will produce a specific result. 1/0 is one easy way to cause an exception.,app.py:669-726;app.py:811-862;app.py:779-810,,
+pallets/flask:4475,https://github.com/pallets/flask/discussions/4475#discussioncomment-2309503,davidism,2022-03-07T15:37:15Z,2022-03-08T13:00:02Z,The issue tracker shows issues that are currently open. https://github.com/pallets/flask/issues The other Pallets projects used by Flask all have their own trackers.,,none,
+pallets/flask:4441,https://github.com/pallets/flask/discussions/4441#discussioncomment-2145704,tachyondecay,2022-02-10T00:22:55Z,2022-02-10T01:22:07Z,The answer is to your question remains the same as in the discussion you referenced.,,none,
+pallets/flask:4440,https://github.com/pallets/flask/discussions/4440#discussioncomment-2108102,tachyondecay,2022-02-04T02:18:15Z,2022-02-22T08:52:46Z,Waitress is a production-quality WSGI server and works on Windows.,,none,
+pallets/flask:4354,https://github.com/pallets/flask/discussions/4354#discussioncomment-1678016,ThiefMaster,2021-11-21T18:09:34Z,2021-11-21T18:57:21Z,Use current_app.config...,globals.py:24-33;sansio/app.py:311-337;config.py:50-101,,
+pallets/flask:4345,https://github.com/pallets/flask/discussions/4345#discussioncomment-1666405,Yourun-proger,2021-11-18T18:15:52Z,2021-11-19T00:40:17Z,"@animehunter123 , hi! There was the following discussion about this, where it says that the documentation will no longer be updated. But you can do it manually using this",,none,
+pallets/flask:4275,https://github.com/pallets/flask/discussions/4275#discussioncomment-1407097,miguelgrinberg,2021-09-30T06:35:03Z,2021-09-30T15:21:14Z,Imports inside the factory function are one of the techniques you can use to avoid circular import errors.,,none,
+pallets/flask:4247,https://github.com/pallets/flask/discussions/4247#discussioncomment-1248677,greyli,2021-08-29T00:45:21Z,2021-08-29T16:25:52Z,The contributing guide contains everything you need to know to contribute to Flask.,,none,
+pallets/flask:4244,https://github.com/pallets/flask/discussions/4244#discussioncomment-1239141,davidism,2021-08-26T12:45:26Z,2021-08-26T12:45:29Z,"When we have time to go through the release process, it will be released. Sorry, we can't give a more precise answer than that.",,none,
 pallets/flask:4235,https://github.com/pallets/flask/discussions/4235#discussioncomment-1170043,davidism,2021-08-13T20:13:48Z,2021-08-16T14:54:39Z,"If all routes are for one host, you don't need to use host matching.
-You can use functools.partial, or otherwise wtite a decorator, to wrap app.route and automatically pass the value you want.",sansio/scaffold.py:335-433;sansio/app.py:604-662;app.py:425-476
+You can use functools.partial, or otherwise wtite a decorator, to wrap app.route and automatically pass the value you want.",sansio/scaffold.py:335-433;sansio/app.py:604-662;app.py:425-476,,
 pallets/flask:4228,https://github.com/pallets/flask/discussions/4228#discussioncomment-1151875,tachyondecay,2021-08-10T01:02:03Z,2021-08-10T11:14:11Z,"You don't need to subclass Request, but you do need to subclass werkzeug.user_agent.UserAgent. Then you can set app.request_class.user_agent_class to be your new user agent class, like so:
 from flask import Flask, request
 from werkzeug.user_agent import UserAgent
@@ -335,10 +335,10 @@ app.request_class.user_agent_class = NewUserAgent
 
 @app.route(""/"")
 def index():
-    return request.user_agent.new_method()",
-pallets/flask:4225,https://github.com/pallets/flask/discussions/4225#discussioncomment-1136780,davidism,2021-08-05T22:12:49Z,2021-08-05T22:14:47Z,Pypi names are case and -_ insensitive.,
-pallets/flask:4178,https://github.com/pallets/flask/discussions/4178#discussioncomment-925611,davidism,2021-06-26T21:34:27Z,2021-06-26T22:05:21Z,Use a blueprint for those routes and error handler.,sansio/scaffold.py:597-655;sansio/blueprints.py:595-610;sansio/app.py:823-846
-pallets/flask:4177,https://github.com/pallets/flask/discussions/4177#discussioncomment-925572,ThiefMaster,2021-06-26T21:00:47Z,2021-06-26T21:04:14Z,You don't need flask for this. Just configure an alias on your webserver so those requests don't even hit your Flask app.,
+    return request.user_agent.new_method()",,none,
+pallets/flask:4225,https://github.com/pallets/flask/discussions/4225#discussioncomment-1136780,davidism,2021-08-05T22:12:49Z,2021-08-05T22:14:47Z,Pypi names are case and -_ insensitive.,,none,
+pallets/flask:4178,https://github.com/pallets/flask/discussions/4178#discussioncomment-925611,davidism,2021-06-26T21:34:27Z,2021-06-26T22:05:21Z,Use a blueprint for those routes and error handler.,sansio/scaffold.py:597-655;sansio/blueprints.py:595-610;sansio/app.py:823-846,,
+pallets/flask:4177,https://github.com/pallets/flask/discussions/4177#discussioncomment-925572,ThiefMaster,2021-06-26T21:00:47Z,2021-06-26T21:04:14Z,You don't need flask for this. Just configure an alias on your webserver so those requests don't even hit your Flask app.,,none,
 pallets/flask:4136,https://github.com/pallets/flask/discussions/4136#discussioncomment-831455,tachyondecay,2021-06-06T13:14:40Z,2021-06-06T18:28:11Z,"I've played around with your _static_rules_endpoint function and made some discoveries that will hopefully help.
 There's good news! Your approach seems to work fine for Blueprint static folders and additional URL rules that point to send_static_file. To me, this seems to indicate the only thing you need to account for is a built-in static endpoint registered to the static_url_path on an app object.
 TL;DR My Suggested Solution
@@ -470,7 +470,7 @@ I haven't tested with nested blueprints that might have static endpoints
 I haven't tested with host matching enabled
 Obviously this will break if Flask ever changes the name of its built-in static endpoint
 
-I hope that this helps, or at least gets you thinking about an approach that works for Frozen Flask!",app.py:226-329;sansio/blueprints.py:302-329;sansio/scaffold.py:224-270
+I hope that this helps, or at least gets you thinking about an approach that works for Frozen Flask!",app.py:226-329;sansio/blueprints.py:302-329;sansio/scaffold.py:224-270,,
 docs:243f1fe848eb,d:\499\docs\appcontext.rst,docs,,,"The App and Request Context
 ===========================
 
@@ -657,7 +657,7 @@ Because it is a stack, other contexts may be pushed to change the proxies during
 an already active context. This is not a common pattern, but can be used in
 advanced use cases. For example, a Flask application can be used as WSGI
 middleware, calling another wrapped Flask app from a view.
-",ctx.py:238-427;globals.py:17-52;app.py:1386-1422
+",ctx.py:238-427;globals.py:17-52;app.py:1386-1422,docs,docs/appcontext.rst:1-186
 docs:403ea318f085,d:\499\docs\appcontext.rst,docs,,,"The App and Request Context
 ===========================
 
@@ -844,7 +844,7 @@ Because it is a stack, other contexts may be pushed to change the proxies during
 an already active context. This is not a common pattern, but can be used in
 advanced use cases. For example, a Flask application can be used as WSGI
 middleware, calling another wrapped Flask app from a view.
-",sansio/app.py:241-247;sansio/app.py:851-857;cli.py:20-26;app.py:32-38;app.py:82-88
+",sansio/app.py:241-247;sansio/app.py:851-857;cli.py:20-26;app.py:32-38;app.py:82-88,docs,docs/appcontext.rst:1-186
 docs:504af3870ad5,d:\499\docs\appcontext.rst,docs,,,"The App and Request Context
 ===========================
 
@@ -1031,7 +1031,7 @@ Because it is a stack, other contexts may be pushed to change the proxies during
 an already active context. This is not a common pattern, but can be used in
 advanced use cases. For example, a Flask application can be used as WSGI
 middleware, calling another wrapped Flask app from a view.
-",app.py:122-128;cli.py:295-301;app.py:668-674;app.py:1489-1495;config.py:78-84
+",app.py:122-128;cli.py:295-301;app.py:668-674;app.py:1489-1495;config.py:78-84,docs,docs/appcontext.rst:1-186
 docs:f6e85686674f,d:\499\docs\appcontext.rst,docs,,,"The App and Request Context
 ===========================
 
@@ -1218,7 +1218,7 @@ Because it is a stack, other contexts may be pushed to change the proxies during
 an already active context. This is not a common pattern, but can be used in
 advanced use cases. For example, a Flask application can be used as WSGI
 middleware, calling another wrapped Flask app from a view.
-",
+",,docs,docs/appcontext.rst:1-186
 docs:ef3aa315d1b2,d:\499\docs\lifecycle.rst,docs,,,"Application Structure and Lifecycle
 ===================================
 
@@ -1390,7 +1390,7 @@ There are even more decorators and customization points than this, but that aren
 of every request lifecycle. They're more specific to certain things you might use during
 a request, such as templates, building URLs, or handling JSON data. See the rest of this
 documentation, as well as the :doc:`api` to explore further.
-",
+",,docs,docs/lifecycle.rst:1-171
 docs:6cce638b1808,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -2099,7 +2099,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",sessions.py:50-56;sessions.py:296-302;sessions.py:183-189;sessions.py:187-193;sessions.py:207-213
+",sessions.py:50-56;sessions.py:296-302;sessions.py:183-189;sessions.py:187-193;sessions.py:207-213,docs,docs/api.rst:1-708
 docs:3d514537cea4,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -2808,7 +2808,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",cli.py:708-714;config.py:68-74;sansio/blueprints.py:313-319;helpers.py:448-454;sansio/scaffold.py:584-590
+",cli.py:708-714;config.py:68-74;sansio/blueprints.py:313-319;helpers.py:448-454;sansio/scaffold.py:584-590,docs,docs/api.rst:1-708
 docs:f5635624b031,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -3517,7 +3517,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",
+",,docs,docs/api.rst:1-708
 docs:7e44710c39aa,d:\499\docs\async-await.rst,docs,,,".. _async_await:
 
 Using ``async`` and ``await``
@@ -3637,7 +3637,7 @@ Other event loops
 At the moment Flask only supports :mod:`asyncio`. It's possible to override
 :meth:`flask.Flask.ensure_sync` to change how async functions are wrapped to use
 a different library. See :ref:`gevent-asyncio` for an example.
-",app.py:82-88;app.py:899-905;helpers.py:122-128;sansio/app.py:60-66;sansio/app.py:652-658
+",app.py:82-88;app.py:899-905;helpers.py:122-128;sansio/app.py:60-66;sansio/app.py:652-658,docs,docs/async-await.rst:1-119
 docs:f5b4f1e9b55c,d:\499\docs\async-await.rst,docs,,,".. _async_await:
 
 Using ``async`` and ``await``
@@ -3757,7 +3757,7 @@ Other event loops
 At the moment Flask only supports :mod:`asyncio`. It's possible to override
 :meth:`flask.Flask.ensure_sync` to change how async functions are wrapped to use
 a different library. See :ref:`gevent-asyncio` for an example.
-",
+",,docs,docs/async-await.rst:1-119
 docs:9cec39143995,d:\499\docs\async-await.rst,docs,,,".. _async_await:
 
 Using ``async`` and ``await``
@@ -3877,7 +3877,7 @@ Other event loops
 At the moment Flask only supports :mod:`asyncio`. It's possible to override
 :meth:`flask.Flask.ensure_sync` to change how async functions are wrapped to use
 a different library. See :ref:`gevent-asyncio` for an example.
-",app.py:1422-1428;helpers.py:419-425;app.py:106-112;app.py:119-125;ctx.py:194-200
+",app.py:1422-1428;helpers.py:419-425;app.py:106-112;app.py:119-125;ctx.py:194-200,docs,docs/async-await.rst:1-119
 docs:9a6b7effc6b3,d:\499\docs\async-await.rst,docs,,,".. _async_await:
 
 Using ``async`` and ``await``
@@ -3997,7 +3997,7 @@ Other event loops
 At the moment Flask only supports :mod:`asyncio`. It's possible to override
 :meth:`flask.Flask.ensure_sync` to change how async functions are wrapped to use
 a different library. See :ref:`gevent-asyncio` for an example.
-",app.py:101-107;app.py:117-123;sessions.py:155-161;sansio/app.py:79-85;sansio/app.py:95-101
+",app.py:101-107;app.py:117-123;sessions.py:155-161;sansio/app.py:79-85;sansio/app.py:95-101,docs,docs/async-await.rst:1-119
 docs:b6cffbb3f4a6,d:\499\docs\blueprints.rst,docs,,,"Modular Applications with Blueprints
 ====================================
 
@@ -4313,7 +4313,7 @@ at the application level using the ``request`` proxy object::
             return ex
 
 See :doc:`/errorhandling`.
-",app.py:104-110;app.py:105-111;app.py:116-122;app.py:167-173;cli.py:197-203
+",app.py:104-110;app.py:105-111;app.py:116-122;app.py:167-173;cli.py:197-203,docs,docs/blueprints.rst:1-315
 docs:7c4e547e428b,d:\499\docs\blueprints.rst,docs,,,"Modular Applications with Blueprints
 ====================================
 
@@ -4629,7 +4629,7 @@ at the application level using the ``request`` proxy object::
             return ex
 
 See :doc:`/errorhandling`.
-",sansio/app.py:370-376;sansio/app.py:587-593;sansio/blueprints.py:55-61;sansio/blueprints.py:261-267;sansio/blueprints.py:296-302
+",sansio/app.py:370-376;sansio/app.py:587-593;sansio/blueprints.py:55-61;sansio/blueprints.py:261-267;sansio/blueprints.py:296-302,docs,docs/blueprints.rst:1-315
 docs:a531e899d178,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -5338,7 +5338,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",app.py:105-111;sansio/app.py:83-89;sansio/app.py:389-395;cli.py:1053-1059;cli.py:1060-1066
+",app.py:105-111;sansio/app.py:83-89;sansio/app.py:389-395;cli.py:1053-1059;cli.py:1060-1066,docs,docs/api.rst:1-708
 docs:e4d00a6b2ad8,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -6047,7 +6047,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",
+",,docs,docs/api.rst:1-708
 docs:c5c4063f2f3b,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -6756,7 +6756,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",ctx.py:389-395;app.py:1031-1037;sansio/app.py:388-394;sansio/app.py:401-407;sansio/app.py:943-949
+",ctx.py:389-395;app.py:1031-1037;sansio/app.py:388-394;sansio/app.py:401-407;sansio/app.py:943-949,docs,docs/api.rst:1-708
 docs:be061774f52e,d:\499\docs\signals.rst,docs,,,"Signals
 =======
 
@@ -6923,7 +6923,7 @@ You can also easily subscribe to signals by using the
 
 
 .. _blinker: https://pypi.org/project/blinker/
-",globals.py:37-43;app.py:84-90;app.py:86-92;cli.py:794-800;cli.py:898-904
+",globals.py:37-43;app.py:84-90;app.py:86-92;cli.py:794-800;cli.py:898-904,docs,docs/signals.rst:1-166
 docs:d2b6881a67a9,d:\499\docs\api.rst,docs,,,"API
 ===
 
@@ -7632,7 +7632,7 @@ Command Line Interface
 .. autodata:: run_command
 
 .. autodata:: shell_command
-",
+",,docs,docs/api.rst:1-708
 docs:931bc8324d9b,d:\499\docs\cli.rst,docs,,,".. currentmodule:: flask
 
 Command Line Interface
@@ -8189,7 +8189,7 @@ PyCharm window and click the play button next to it to run the server.
 
 Now that you have a configuration for ``flask run``, you can copy that configuration and
 change the *Parameters* argument to run a different CLI command.
-",app.py:256-262;blueprints.py:49-55;ctx.py:239-245;app.py:249-255;app.py:725-731
+",app.py:256-262;blueprints.py:49-55;ctx.py:239-245;app.py:249-255;app.py:725-731,docs,docs/cli.rst:1-556
 docs:df867111da24,d:\499\docs\cli.rst,docs,,,".. currentmodule:: flask
 
 Command Line Interface
@@ -8746,7 +8746,7 @@ PyCharm window and click the play button next to it to run the server.
 
 Now that you have a configuration for ``flask run``, you can copy that configuration and
 change the *Parameters* argument to run a different CLI command.
-",
+",,docs,docs/cli.rst:1-556
 docs:e8f9ad696acb,d:\499\docs\config.rst,docs,,,"Configuration Handling
 ======================
 
@@ -9586,7 +9586,7 @@ Example usage for both::
     # or via open_instance_resource:
     with app.open_instance_resource('application.cfg') as f:
         config = f.read()
-",
+",,docs,docs/config.rst:1-839
 docs:82965780331f,d:\499\docs\debugging.rst,docs,,,"Debugging Application Errors
 ============================
 
@@ -9686,7 +9686,7 @@ following caveats.
             debug=True, passthrough_errors=True,
             use_debugger=False, use_reloader=False
         )
-",helpers.py:461-467;sansio/app.py:200-206;sansio/app.py:198-204;json/provider.py:150-156;app.py:553-559
+",helpers.py:461-467;sansio/app.py:200-206;sansio/app.py:198-204;json/provider.py:150-156;app.py:553-559,docs,docs/debugging.rst:1-99
 docs:7f2f9be2ba46,d:\499\docs\errorhandling.rst,docs,,,"Handling Application Errors
 ===========================
 
@@ -10210,7 +10210,7 @@ Debugging
 
 See :doc:`/debugging` for information about how to debug errors in
 development and production.
-",sansio/app.py:155-161;sansio/app.py:497-503;app.py:883-889;app.py:904-910;app.py:946-952
+",sansio/app.py:155-161;sansio/app.py:497-503;app.py:883-889;app.py:904-910;app.py:946-952,docs,docs/errorhandling.rst:1-523
 docs:c0c5781633ce,d:\499\docs\testing.rst,docs,,,"Testing Flask Applications
 ==========================
 
@@ -10529,7 +10529,7 @@ it's possible to call them manually.
         with app.test_request_context(""/user/2/edit"", headers={""X-Auth-Token"": ""1""}):
             app.preprocess_request()
             assert g.user.name == ""Flask""
-",app.py:683-689;app.py:670-676;app.py:671-677;app.py:1423-1429;sansio/scaffold.py:508-514
+",app.py:683-689;app.py:670-676;app.py:671-677;app.py:1423-1429;sansio/scaffold.py:508-514,docs,docs/testing.rst:1-318
 docs:1471e4fe9fd7,d:\499\docs\testing.rst,docs,,,"Testing Flask Applications
 ==========================
 
@@ -10848,7 +10848,7 @@ it's possible to call them manually.
         with app.test_request_context(""/user/2/edit"", headers={""X-Auth-Token"": ""1""}):
             app.preprocess_request()
             assert g.user.name == ""Flask""
-",app.py:250-256;app.py:343-349;app.py:412-418;cli.py:540-546;app.py:587-593
+",app.py:250-256;app.py:343-349;app.py:412-418;cli.py:540-546;app.py:587-593,docs,docs/testing.rst:1-318
 docs:2665723ecef2,d:\499\docs\templating.rst,docs,,,"Templates
 =========
 
@@ -11104,7 +11104,7 @@ functions to make this easier to use.
 These functions automatically apply the
 :func:`~flask.stream_with_context` wrapper if a request is active, so
 that it remains available in the template.
-",sansio/scaffold.py:169-175;sansio/scaffold.py:544-550;app.py:82-88;app.py:268-274;app.py:505-511
+",sansio/scaffold.py:169-175;sansio/scaffold.py:544-550;app.py:82-88;app.py:268-274;app.py:505-511,docs,docs/templating.rst:1-255
 docs:84936503a3e1,d:\499\docs\logging.rst,docs,,,"Logging
 =======
 
@@ -11288,7 +11288,7 @@ Flask Extensions
 Depending on the situation, an extension may choose to log to
 :meth:`app.logger <flask.Flask.logger>` or its own named logger. Consult each
 extension's documentation for details.
-",debughelpers.py:175-178;logging.py:55-61;logging.py:68-74;sansio/app.py:441-447;cli.py:530-536
+",debughelpers.py:175-178;logging.py:55-61;logging.py:68-74;sansio/app.py:441-447;cli.py:530-536,docs,docs/logging.rst:1-183
 docs:e1ce63456733,d:\499\docs\web-security.rst,docs,,,"Security Considerations
 =======================
 
@@ -11605,4 +11605,4 @@ pasting, so this isn't strictly necessary. It's also possible to craft
 dangerous commands in other ways that aren't possible to filter.
 Depending on your site's use case, it may be good to show a warning
 about copying code in general.
-",
+",,docs,docs/web-security.rst:1-316

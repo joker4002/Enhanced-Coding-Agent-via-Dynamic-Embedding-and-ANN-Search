@@ -17,6 +17,13 @@ class CodeLocation:
     end_line: int
 
 
+@dataclass(frozen=True)
+class GroundTruthEntry:
+    answer_source: str
+    code_locations: List[CodeLocation]
+    doc_locations: List[CodeLocation]
+
+
 def _ensure_faiss() -> "object":
     try:
         import faiss  # type: ignore
@@ -91,31 +98,64 @@ def _parse_code_locations(raw: str) -> List[CodeLocation]:
     return out
 
 
-def _load_groundtruth_locations(path: str) -> Dict[str, List[CodeLocation]]:
-    merged: Dict[str, List[CodeLocation]] = {}
+def _dedupe_locations(locs: List[CodeLocation]) -> List[CodeLocation]:
+    if not locs:
+        return []
+    seen = set()
+    uniq: List[CodeLocation] = []
+    for loc in locs:
+        key = (loc.file, loc.start_line, loc.end_line)
+        if key in seen:
+            continue
+        seen.add(key)
+        uniq.append(loc)
+    return uniq
+
+
+def _normalize_answer_source(raw: str) -> str:
+    s = (raw or "").strip().lower()
+    if s in {"code", "docs", "mixed", "none"}:
+        return s
+    return ""
+
+
+def _load_groundtruth_entries(path: str) -> Dict[str, GroundTruthEntry]:
+    merged: Dict[str, GroundTruthEntry] = {}
     for row in _iter_csv_dict(path):
         rid = (row.get("id") or "").strip()
         if not rid:
             continue
 
-        locs = _parse_code_locations(row.get("code_locations") or "")
-        if not locs:
-            continue
+        answer_source = _normalize_answer_source(row.get("answer_source") or "")
+        code_locs = _dedupe_locations(_parse_code_locations(row.get("code_locations") or ""))
+        doc_locs = _dedupe_locations(_parse_code_locations(row.get("doc_locations") or ""))
 
-        merged.setdefault(rid, []).extend(locs)
+        if not answer_source:
+            if code_locs and doc_locs:
+                answer_source = "mixed"
+            elif code_locs:
+                answer_source = "code"
+            elif doc_locs:
+                answer_source = "docs"
+            else:
+                answer_source = "none"
 
-    for rid, locs in list(merged.items()):
-        seen = set()
-        uniq: List[CodeLocation] = []
-        for loc in locs:
-            key = (loc.file, loc.start_line, loc.end_line)
-            if key in seen:
-                continue
-            seen.add(key)
-            uniq.append(loc)
-        merged[rid] = uniq
+        merged[rid] = GroundTruthEntry(
+            answer_source=answer_source,
+            code_locations=code_locs,
+            doc_locations=doc_locs,
+        )
 
     return merged
+
+
+def _load_groundtruth_locations(path: str) -> Dict[str, List[CodeLocation]]:
+    entries = _load_groundtruth_entries(path)
+    return {
+        rid: entry.code_locations
+        for rid, entry in entries.items()
+        if entry.code_locations
+    }
 
 
 def _normalize_result_file_path(file_path: object) -> str:
@@ -124,11 +164,11 @@ def _normalize_result_file_path(file_path: object) -> str:
 
     p = file_path.replace("\\", "/")
     lo = p.lower()
-    marker = "/src/flask/"
-    idx = lo.rfind(marker)
-    if idx >= 0:
-        rel = p[idx + len(marker) :]
-        return rel.strip("/").lower()
+    for marker in ("/src/flask/", "/docs/", "/doc/"):
+        idx = lo.rfind(marker)
+        if idx >= 0:
+            rel = p[idx + len(marker) :]
+            return rel.strip("/").lower()
     return os.path.basename(p).lower()
 
 
@@ -886,6 +926,7 @@ def evaluate_questions_recall(
     sources: Sequence[SourceSpec],
     questions_csv: str,
     groundtruth_csv: str,
+    eval_target: str,
     model_name: str,
     top_k: int,
     per_index_k: int,
@@ -909,7 +950,11 @@ def evaluate_questions_recall(
     except Exception as e:
         raise RuntimeError("numpy is required") from e
 
-    gt = _load_groundtruth_locations(groundtruth_csv)
+    eval_target_norm = (eval_target or "").strip().lower()
+    if eval_target_norm not in {"code", "docs"}:
+        raise RuntimeError(f"Invalid eval_target: {eval_target!r}. Expected 'code' or 'docs'.")
+
+    gt_entries = _load_groundtruth_entries(groundtruth_csv)
 
     model = SentenceTransformer(model_name)
     chunks_cache: Dict[str, List[Dict]] = {}
@@ -919,12 +964,28 @@ def evaluate_questions_recall(
     n_total = 0
     n_evaluated = 0
     n_skipped_no_gt = 0
+    n_skipped_out_of_target = 0
 
     for rid, qtext in _iter_questions_csv(
         questions_csv, id_col=id_col, question_col=question_col, limit=limit
     ):
         n_total += 1
-        locs = gt.get(rid) or []
+
+        entry = gt_entries.get(rid)
+        if entry is None:
+            entry = GroundTruthEntry(answer_source="none", code_locations=[], doc_locations=[])
+
+        if eval_target_norm == "code":
+            if entry.answer_source not in {"code", "mixed"}:
+                n_skipped_out_of_target += 1
+                continue
+            locs = entry.code_locations
+        else:
+            if entry.answer_source not in {"docs", "mixed"}:
+                n_skipped_out_of_target += 1
+                continue
+            locs = entry.doc_locations
+
         if not locs and not include_empty_gt:
             n_skipped_no_gt += 1
             continue
@@ -959,6 +1020,8 @@ def evaluate_questions_recall(
                     {
                         "metric": "recall@k_per_query",
                         "id": rid,
+                        "eval_target": eval_target_norm,
+                        "answer_source": entry.answer_source,
                         "n_gt": len(locs),
                         "ks": [int(k) for k in ks],
                         "values": {str(k): per[int(k)] for k in ks},
@@ -974,7 +1037,7 @@ def evaluate_questions_recall(
 
     if n_evaluated <= 0:
         print(
-            "No queries evaluated. Either the CSV is empty or all rows had empty groundtruth code_locations.",
+            "No queries evaluated. Either the CSV is empty or all rows were skipped (out-of-target or empty groundtruth for the selected eval target).",
             file=sys.stderr,
         )
         return
@@ -983,9 +1046,11 @@ def evaluate_questions_recall(
         json.dumps(
             {
                 "metric": "recall@k",
+                "eval_target": eval_target_norm,
                 "n_total": n_total,
                 "n_evaluated": n_evaluated,
                 "n_skipped_no_gt": n_skipped_no_gt,
+                "n_skipped_out_of_target": n_skipped_out_of_target,
                 "ks": [int(k) for k in ks],
                 "values": {str(k): (totals[int(k)] / float(n_evaluated)) for k in ks},
             },
@@ -1012,12 +1077,18 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument(
         "--groundtruth-csv",
         default=None,
-        help="Groundtruth CSV containing 'id' and 'code_locations' (e.g. groundtruth.csv).",
+        help="Groundtruth CSV containing 'id' and locations. Supports columns: code_locations, doc_locations, answer_source.",
     )
     p.add_argument(
         "--eval-ks",
         default="1,3,5,10",
         help="Comma/space-separated ks for recall@k when --questions-csv is provided.",
+    )
+    p.add_argument(
+        "--eval-target",
+        choices=["code", "docs"],
+        default="code",
+        help="Which groundtruth field to evaluate: code uses code_locations; docs uses doc_locations. Also filters rows by answer_source (code/mixed vs docs/mixed).",
     )
     p.add_argument(
         "--eval-sources",
@@ -1043,7 +1114,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     p.add_argument(
         "--eval-include-empty-gt",
         action="store_true",
-        help="Include rows whose groundtruth has empty code_locations (they contribute recall=0). Default: skip.",
+        help="Include rows whose groundtruth has empty locations for the selected --eval-target (they contribute recall=0). Default: skip.",
     )
     p.add_argument(
         "--eval-details",
@@ -1192,6 +1263,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             sources=sources,
             questions_csv=str(args.questions_csv),
             groundtruth_csv=str(args.groundtruth_csv),
+            eval_target=str(args.eval_target),
             model_name=args.model,
             top_k=top_k_eval,
             per_index_k=per_index_k_eval,
